@@ -1,6 +1,6 @@
 from pathlib import Path
-from datetime import timedelta
 from .database import DATABASES
+from .rest_framework import REST_FRAMEWORK, SIMPLE_JWT
 
 from decouple import config
 
@@ -43,6 +43,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
 ]
 
@@ -104,6 +105,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+ASGI_APPLICATION = "config.asgi.application"
+
 AUTH_USER_MODEL = "accounts.CustomUser"
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -158,3 +161,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 # ==========================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ==========================================================
+# CORS
+# ==========================================================
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
