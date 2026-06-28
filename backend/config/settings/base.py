@@ -103,3 +103,58 @@ TEMPLATES = [
 # ==========================================================
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+]
+
+# ==========================================================
+# INTERNATIONALIZATION
+# ==========================================================
+
+LANGUAGE_CODE = "fr-fr"
+
+TIME_ZONE = "Indian/Antananarivo"
+
+USE_I18N = True
+
+USE_TZ = True
+
+# ==========================================================
+# STATIC FILES
+# ==========================================================
+
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# ==========================================================
+# MEDIA FILES
+# ==========================================================
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
+
+# ==========================================================
+# DEFAULT PRIMARY KEY
+# ==========================================================
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
