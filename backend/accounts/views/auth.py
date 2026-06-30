@@ -102,7 +102,6 @@ class LogoutView(BaseAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request.data)
         serializer = LogoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

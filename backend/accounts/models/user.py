@@ -9,6 +9,15 @@ class CustomUser(AbstractUser):
     Modèle utilisateur personnalisé.
     """
 
+    role = models.ForeignKey(
+        "accounts.Role",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="users",
+        verbose_name="Rôle",
+    )   
+
     telephone = models.CharField(
         max_length=20,
         blank=True,
@@ -33,6 +42,8 @@ class CustomUser(AbstractUser):
 
     # Gestionnaire personnalisé
     objects = CustomUserManager()
+
+   
 
     class Meta:
         db_table = "users"
