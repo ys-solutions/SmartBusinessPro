@@ -3,11 +3,7 @@ from rest_framework.permissions import BasePermission
 
 class HasPermission(BasePermission):
     """
-    Permission de base basée sur les permissions
-    attribuées au rôle de l'utilisateur.
-
-    Les classes filles devront définir
-    la propriété required_permission.
+    Permission basée sur le rôle de l'utilisateur.
     """
 
     required_permission = None
@@ -16,19 +12,25 @@ class HasPermission(BasePermission):
 
         user = request.user
 
+        # Utilisateur non connecté
         if not user or not user.is_authenticated:
             return False
 
+        # Le superutilisateur possède toutes les permissions
         if user.is_superuser:
             return True
 
-        if user.role is None:
+        # Récupère le rôle de manière sécurisée
+        role = getattr(user, "role", None)
+
+        if role is None:
             return False
 
-        if self.required_permission is None:
+        # Aucune permission demandée
+        if not self.required_permission:
             return False
 
-        return user.role.permissions.filter(
-            code=self.required_permission,
-            is_active=True,
-        ).exists()
+        # Vérifie la permission
+        return role.has_permission(
+            self.required_permission
+        )

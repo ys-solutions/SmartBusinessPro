@@ -42,5 +42,22 @@ class Role(models.Model):
         verbose_name = "Rôle"
         verbose_name_plural = "Rôles"
 
+    def has_permission(self, permission_code):
+        """
+        Vérifie si le rôle possède une permission.
+        """
+
+        try:
+            module, resource, action = permission_code.split(".")
+        except ValueError:
+            return False
+
+        return self.permissions.filter(
+            module=module,
+            resource=resource,
+            action=action,
+            is_active=True,
+        ).exists()
+
     def __str__(self):
         return self.name

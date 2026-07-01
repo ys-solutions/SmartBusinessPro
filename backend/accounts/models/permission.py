@@ -6,10 +6,19 @@ class Permission(models.Model):
     Permission métier.
     """
 
-    code = models.CharField(
-        max_length=100,
-        unique=True,
-        verbose_name="Code",
+    module = models.CharField(
+        max_length=50,
+        verbose_name="Module",
+    )
+
+    resource = models.CharField(
+        max_length=50,
+        verbose_name="Ressource",
+    )
+
+    action = models.CharField(
+        max_length=50,
+        verbose_name="Action",
     )
 
     name = models.CharField(
@@ -20,11 +29,6 @@ class Permission(models.Model):
     description = models.TextField(
         blank=True,
         verbose_name="Description",
-    )
-
-    module = models.CharField(
-        max_length=100,
-        verbose_name="Module",
     )
 
     is_active = models.BooleanField(
@@ -41,9 +45,25 @@ class Permission(models.Model):
 
     class Meta:
         db_table = "permissions"
-        ordering = ["module", "name"]
+
+        ordering = [
+            "module",
+            "resource",
+            "action",
+        ]
+
+        unique_together = (
+            "module",
+            "resource",
+            "action",
+        )
+
         verbose_name = "Permission"
         verbose_name_plural = "Permissions"
 
+    @property
+    def code(self):
+        return f"{self.module}.{self.resource}.{self.action}"
+
     def __str__(self):
-        return f"{self.module} - {self.name}"
+        return self.code
