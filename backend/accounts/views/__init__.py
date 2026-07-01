@@ -4,3 +4,8 @@ from .auth import (
     MeView,
     LogoutView,
 )
+
+from .role import (
+    RoleListCreateView,
+    RoleDetailView,
+)

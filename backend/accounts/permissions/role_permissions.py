@@ -10,7 +10,7 @@ class HasPermission(BasePermission):
 
     def has_permission(self, request, view):
 
-        user = request.user
+        user = request.user 
 
         # Utilisateur non connecté
         if not user or not user.is_authenticated:
@@ -34,3 +34,4 @@ class HasPermission(BasePermission):
         return role.has_permission(
             self.required_permission
         )
+

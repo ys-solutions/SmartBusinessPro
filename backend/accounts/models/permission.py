@@ -8,16 +8,22 @@ class Permission(models.Model):
 
     module = models.CharField(
         max_length=50,
+        blank=True,
+        null=True,
         verbose_name="Module",
     )
 
     resource = models.CharField(
         max_length=50,
+        blank=True,
+        null=True,
         verbose_name="Ressource",
     )
 
     action = models.CharField(
         max_length=50,
+        blank=True,
+        null=True,
         verbose_name="Action",
     )
 
@@ -33,6 +39,7 @@ class Permission(models.Model):
 
     is_active = models.BooleanField(
         default=True,
+        verbose_name="Actif",
     )
 
     created_at = models.DateTimeField(
