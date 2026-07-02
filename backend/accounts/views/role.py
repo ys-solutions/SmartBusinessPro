@@ -7,6 +7,9 @@ from core.responses import ApiResponse
 from accounts.serializers import RoleSerializer
 from accounts.services import RoleService
 
+from accounts.models import Permission
+from accounts.serializers import RolePermissionSerializer
+
 
 class RoleListCreateView(BaseAPIView):
     """
@@ -99,4 +102,57 @@ class RoleDetailView(BaseAPIView):
 
         return ApiResponse.success(
             message="Rôle supprimé avec succès.",
+        )
+    
+class RolePermissionView(BaseAPIView):
+    """
+    Consultation et attribution des permissions d'un rôle.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+
+        role = RoleService.get(pk)
+
+        permissions = role.permissions.all()
+
+        data = {
+            "role": role.name,
+            "permissions": [
+                {
+                    "id": permission.id,
+                    "module": permission.module,
+                    "resource": permission.resource,
+                    "action": permission.action,
+                    "name": permission.name,
+                }
+                for permission in permissions
+            ],
+        }
+
+        return ApiResponse.success(
+            message="Permissions du rôle.",
+            data=data,
+        )
+
+    def put(self, request, pk):
+
+        role = RoleService.get(pk)
+
+        serializer = RolePermissionSerializer(
+            data=request.data,
+        )
+
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        RoleService.set_permissions(
+            role,
+            serializer.validated_data["permissions"],
+        )
+
+        return ApiResponse.success(
+            message="Permissions mises à jour avec succès.",
         )

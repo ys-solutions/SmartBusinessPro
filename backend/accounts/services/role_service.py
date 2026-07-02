@@ -34,3 +34,14 @@ class RoleService(BaseCrudService):
                 role.is_active,
             ),
         )
+    
+    @classmethod
+    def set_permissions(cls, role, permissions):
+        """
+        Attribue les permissions à un rôle.
+        """
+
+        role.permissions.set(permissions)
+        role.save()
+
+        return role

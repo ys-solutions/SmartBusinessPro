@@ -14,6 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         created = 0
+        updated = 0
 
         for attribute in dir(Permissions):
 
@@ -42,14 +43,26 @@ class Command(BaseCommand):
                 defaults={
                     "name": attribute.replace("_", " ").title(),
                     "description": "",
+                    "is_active": True,
                 },
             )
 
             if is_created:
                 created += 1
+            else:
+                permission.name = attribute.replace("_", " ").title()
+                permission.is_active = True
+                permission.save(
+                    update_fields=[
+                        "name",
+                        "is_active",
+                    ]
+                )
+                updated += 1
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"{created} permission(s) créée(s)."
+                f"{created} permission(s) créée(s), "
+                f"{updated} mise(s) à jour."
             )
         )

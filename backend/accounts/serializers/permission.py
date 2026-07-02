@@ -1,18 +1,21 @@
 from core.base import BaseModelSerializer
 
-from accounts.models import Role
+from accounts.models import Permission
 
 
-class RoleSerializer(BaseModelSerializer):
+class PermissionSerializer(BaseModelSerializer):
     """
-    Serializer des rôles.
+    Serializer des permissions.
     """
 
     class Meta:
-        model = Role
+        model = Permission
 
         fields = (
             "id",
+            "module",
+            "resource",
+            "action",
             "name",
             "description",
             "is_active",

@@ -1,13 +1,9 @@
-from rest_framework import serializers
+from core.base import BaseModelSerializer
 
 from accounts.models import CustomUser
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """
-    Serializer utilisé pour afficher les informations
-    d'un utilisateur.
-    """
+class UserSerializer(BaseModelSerializer):
 
     class Meta:
         model = CustomUser
