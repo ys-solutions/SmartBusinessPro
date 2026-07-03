@@ -10,3 +10,13 @@ from .role import (
     RoleDetailView,
     RolePermissionView,
 )
+
+from .permission import (
+    PermissionListCreateView,
+    PermissionDetailView,
+)
+
+from .user import (
+    UserListCreateView,
+    UserDetailView,
+)

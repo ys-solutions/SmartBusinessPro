@@ -1,13 +1,49 @@
-from accounts.serializers import RegisterSerializer
+from core.base import BaseCrudService
+
+from accounts.models import CustomUser
 
 
-class UserService:
+class UserService(BaseCrudService):
     """
-    Service responsable de la gestion des utilisateurs.
+    Service métier des utilisateurs.
     """
 
-    @staticmethod
-    def create_user(data):
-        serializer = RegisterSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        return serializer.save()
+    model = CustomUser
+
+    @classmethod
+    def create(cls, data):
+
+        return cls.model.objects.create_user(
+            username=data["username"],
+            password=data["password"],
+            first_name=data.get("first_name", ""),
+            last_name=data.get("last_name", ""),
+            email=data.get("email", ""),
+            telephone=data.get("telephone", ""),
+            photo=data.get("photo"),
+            role=data.get("role"),
+            is_active=data.get("is_active", True),
+        )
+
+    @classmethod
+    def update(cls, user, data):
+
+        for field in (
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "telephone",
+            "photo",
+            "role",
+            "is_active",
+        ):
+            if field in data:
+                setattr(user, field, data[field])
+
+        if data.get("password"):
+            user.set_password(data["password"])
+
+        user.save()
+
+        return user

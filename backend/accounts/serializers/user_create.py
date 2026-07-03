@@ -1,19 +1,26 @@
+from rest_framework import serializers
+
 from core.base import BaseModelSerializer
 
 from accounts.models import CustomUser
 
 
-class UserSerializer(BaseModelSerializer):
+class UserCreateSerializer(BaseModelSerializer):
     """
-    Serializer des utilisateurs.
+    Serializer de création d'un utilisateur.
     """
+
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+    )
 
     class Meta:
         model = CustomUser
 
         fields = (
-            "id",
             "username",
+            "password",
             "first_name",
             "last_name",
             "email",
@@ -21,12 +28,4 @@ class UserSerializer(BaseModelSerializer):
             "photo",
             "role",
             "is_active",
-            "created_at",
-            "updated_at",
-        )
-
-        read_only_fields = (
-            "id",
-            "created_at",
-            "updated_at",
         )
