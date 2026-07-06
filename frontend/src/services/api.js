@@ -1,17 +1,26 @@
 const API_URL = "http://127.0.0.1:8000/api/v1";
 
 async function request(url, options = {}) {
-  const token = localStorage.getItem("token");
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
+
+  // On n'ajoute PAS le token pour login/register
+  if (
+    !url.startsWith("/auth/login") &&
+    !url.startsWith("/auth/register")
+  ) {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+  }
 
   const response = await fetch(API_URL + url, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && {
-        Authorization: `Bearer ${token}`,
-      }),
-      ...options.headers,
-    },
     ...options,
+    headers,
   });
 
   const data = await response.json();
