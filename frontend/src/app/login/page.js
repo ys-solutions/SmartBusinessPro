@@ -3,43 +3,42 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { api } from "@/services/api";
-import { useUser } from "@/context/UserContext";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { loginSchema } from "@/validations/loginSchema";
+
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+
+import { authService } from "@/services/auth";
+
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser } = useUser();
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
 
+  const onSubmit = async (data) => {
     setLoading(true);
-    setError("");
+    setServerError("");
 
     try {
-      const response = await api.post("/auth/login/", {
-        username,
-        password,
-      });
-
-      const { user, tokens } = response.data;
-
-      localStorage.setItem("token", tokens.access);
-      localStorage.setItem("refresh", tokens.refresh);
-
-      setUser(user);
-
+      await authService.login(data);
       router.push("/dashboard");
-
-    } catch (err) {
-      setError(
-        err?.message ||
+    } catch {
+      setServerError(
         "Nom d'utilisateur ou mot de passe incorrect."
       );
     } finally {
@@ -48,95 +47,89 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-700 via-blue-500 to-cyan-400 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 flex items-center justify-center">
 
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md"
+      >
 
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-
-          <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-            SB
-          </div>
-
-          <h1 className="mt-4 text-3xl font-bold text-gray-800">
-            SmartBusiness Pro
-          </h1>
-
-          <p className="text-gray-500 mt-2">
-            Connectez-vous à votre espace
-          </p>
-
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/images/logo.png"
+            alt="SmartBusiness Pro"
+            width={90}
+            height={90}
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <h1 className="text-3xl font-bold text-center">
+          SmartBusiness Pro
+        </h1>
 
-          {error && (
-            <div className="bg-red-100 border border-red-300 text-red-700 rounded-lg p-3">
-              {error}
+        <p className="text-center text-gray-500 mt-2 mb-8">
+          Connectez-vous à votre espace
+        </p>
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-5"
+        >
+
+          <Input
+            label="Nom d'utilisateur"
+            {...register("username")}
+            error={errors.username?.message}
+          />
+
+          <Input
+            label="Mot de passe"
+            type="password"
+            {...register("password")}
+            error={errors.password?.message}
+          />
+
+          {serverError && (
+            <div className="text-red-500 text-sm">
+              {serverError}
             </div>
           )}
 
-          <div>
+          <div className="flex items-center justify-between">
 
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nom d'utilisateur
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+
+              <input
+                type="checkbox"
+                className="rounded"
+              />
+
+              Se souvenir de moi
+
             </label>
 
-            <input
-              type="text"
-              placeholder="Nom d'utilisateur"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <button
+              type="button"
+              className="text-blue-600 hover:underline text-sm"
+            >
+              Mot de passe oublié ?
+            </button>
 
           </div>
 
-          <div>
-
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mot de passe
-            </label>
-
-            <input
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-
-          </div>
-
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold transition"
+            loading={loading}
+            className="w-full"
           >
-            {loading ? "Connexion..." : "Se connecter"}
-          </button>
+            Se connecter
+          </Button>
 
         </form>
 
-        <div className="mt-6 text-center">
-
-          <button
-            type="button"
-            className="text-blue-600 hover:underline text-sm"
-          >
-            Mot de passe oublié ?
-          </button>
-
-        </div>
-
-        <div className="mt-8 border-t pt-4 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} SmartBusiness Pro
-        </div>
-
-      </div>
+      </motion.div>
 
     </div>
   );
