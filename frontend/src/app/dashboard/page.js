@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Clients"
-          value="1 254"
+          value={1254}
           subtitle="+15 aujourd'hui"
           icon={Users}
           color="blue"
@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Utilisateurs"
-          value="48"
+          value={48}
           subtitle="Tous actifs"
           icon={UserCog}
           color="green"
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Produits"
-          value="325"
+          value={325}
           subtitle="12 nouveaux"
           icon={Package}
           color="yellow"
@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Comptes"
-          value="84"
+          value={84}
           subtitle="Tous actifs"
           icon={Landmark}
           color="purple"
@@ -71,7 +71,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Transactions"
-          value="3420"
+          value={3420}
           subtitle="Aujourd'hui"
           icon={ArrowLeftRight}
           color="indigo"
@@ -79,7 +79,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Employés"
-          value="18"
+          value={18}
           subtitle="En activité"
           icon={Briefcase}
           color="red"
