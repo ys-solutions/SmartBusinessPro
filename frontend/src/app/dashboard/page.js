@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import { dashboardService } from "@/services/dashboard";
+
 import MainLayout from "@/components/layout/MainLayout";
 
 import StatCard from "@/components/dashboard/StatCard";
@@ -18,7 +22,61 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+
+  const [stats, setStats] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+    const loadDashboard = async () => {
+
+      try {
+
+        const res = await dashboardService.getStats();
+
+        if (res.success) {
+
+          setStats(res.data);
+
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    loadDashboard();
+
+  }, []);
+
+  if (loading) {
+
+    return (
+
+      <MainLayout>
+
+        <div className="flex justify-center items-center h-[70vh] text-xl font-semibold">
+
+          Chargement...
+
+        </div>
+
+      </MainLayout>
+
+    );
+
+  }
+
   return (
+
     <MainLayout>
 
       {/* En-tête */}
@@ -39,7 +97,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Clients"
-          value={1254}
+          value={stats?.clients ?? 0}
           subtitle="+15 aujourd'hui"
           icon={Users}
           color="blue"
@@ -47,7 +105,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Utilisateurs"
-          value={48}
+          value={stats?.users ?? 0}
           subtitle="Tous actifs"
           icon={UserCog}
           color="green"
@@ -55,7 +113,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Produits"
-          value={325}
+          value={stats?.products ?? 0}
           subtitle="12 nouveaux"
           icon={Package}
           color="yellow"
@@ -63,7 +121,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Comptes"
-          value={84}
+          value={stats?.accounts ?? 0}
           subtitle="Tous actifs"
           icon={Landmark}
           color="purple"
@@ -71,7 +129,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Transactions"
-          value={3420}
+          value={stats?.transactions ?? 0}
           subtitle="Aujourd'hui"
           icon={ArrowLeftRight}
           color="indigo"
@@ -79,7 +137,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Employés"
-          value={18}
+          value={stats?.employees ?? 0}
           subtitle="En activité"
           icon={Briefcase}
           color="red"
@@ -111,5 +169,7 @@ export default function DashboardPage() {
       </div>
 
     </MainLayout>
+
   );
+
 }
