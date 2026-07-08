@@ -6,12 +6,15 @@ import MainLayout from "@/components/layout/MainLayout";
 import UserTable from "@/components/users/UserTable";
 import UserSearch from "@/components/users/UserSearch";
 import { userService } from "@/services/user";
+import UserDetail from "@/components/users/UserDetail";
 
 export default function UsersPage() {
 
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openDetail, setOpenDetail] = useState(false);
 
   useEffect(() => {
 
@@ -45,6 +48,14 @@ export default function UsersPage() {
 
   }, []);
 
+  const handleView = (user) => {
+
+    setSelectedUser(user);
+
+    setOpenDetail(true);
+
+  };
+
 
   // Filtrage des utilisateurs
   const filteredUsers = users.filter((user) => {
@@ -53,12 +64,12 @@ export default function UsersPage() {
 
     return (
       user.username?.toLowerCase().includes(searchText) ||
-      user.email?.toLowerCase().includes(searchText) ||
-      user.name?.toLowerCase().includes(searchText)
+      user.first_name?.toLowerCase().includes(searchText) ||
+      user.last_name?.toLowerCase().includes(searchText) ||
+      user.email?.toLowerCase().includes(searchText)
     );
 
   });
-
 
   return (
 
@@ -108,9 +119,20 @@ export default function UsersPage() {
         :
 
         (
+          <>
 
-          <UserTable users={filteredUsers} />
+            <UserTable
+              users={filteredUsers}
+              onView={handleView}
+            />
 
+            <UserDetail
+              open={openDetail}
+              user={selectedUser}
+              onClose={() => setOpenDetail(false)}
+            />
+
+          </>
         )
 
       }
