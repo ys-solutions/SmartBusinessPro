@@ -7,6 +7,7 @@ import UserTable from "@/components/users/UserTable";
 import UserSearch from "@/components/users/UserSearch";
 import { userService } from "@/services/user";
 import UserDetail from "@/components/users/UserDetail";
+import UserForm from "@/components/users/UserForm";
 
 export default function UsersPage() {
 
@@ -15,16 +16,16 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDetail, setOpenDetail] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
-  useEffect(() => {
-
-    const loadUsers = async () => {
+  const loadUsers = async () => {
 
       try {
 
-        const res = await userService.getAll();
+        setLoading(true);
 
-        console.log("Réponse API :", res);
+        const res = await userService.getAll();
 
         if (res.success) {
 
@@ -44,15 +45,39 @@ export default function UsersPage() {
 
     };
 
-    loadUsers();
+    useEffect(() => {
 
-  }, []);
+      loadUsers();
+
+    }, []);
 
   const handleView = (user) => {
 
     setSelectedUser(user);
 
     setOpenDetail(true);
+
+  };
+
+  const handleCreate = async (data) => {
+
+    try {
+
+      const payload = { ...data };
+
+      delete payload.confirm_password;
+
+      await userService.create(payload);
+
+      setOpenForm(false);
+
+      await loadUsers();
+
+    } catch (error) {
+
+      console.error("Erreur création utilisateur :", error);
+
+    }
 
   };
 
@@ -90,7 +115,11 @@ export default function UsersPage() {
         </div>
 
 
-        <button 
+        <button
+          onClick={() => {
+            setEditingUser(null);
+            setOpenForm(true);
+          }}
           className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
         >
           + Nouvel utilisateur
@@ -130,6 +159,13 @@ export default function UsersPage() {
               open={openDetail}
               user={selectedUser}
               onClose={() => setOpenDetail(false)}
+            />
+
+            <UserForm
+                open={openForm}
+                user={editingUser}
+                onClose={() => setOpenForm(false)}
+                onSubmit={handleCreate}
             />
 
           </>
