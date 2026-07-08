@@ -104,10 +104,14 @@ export default function Sidebar() {
             >
               <Icon size={20} />
 
+              
+
               <span>{menu.title}</span>
             </Link>
           );
         })}
+
+        
 
       </nav>
 

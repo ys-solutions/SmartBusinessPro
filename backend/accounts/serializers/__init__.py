@@ -1,4 +1,4 @@
-from .user import UserSerializer
+from .user import UserSerializer, UserListSerializer
 from .auth import RegisterSerializer, LoginSerializer
 from .logout import LogoutSerializer
 from .role import RoleSerializer

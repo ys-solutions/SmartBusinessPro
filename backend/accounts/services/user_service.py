@@ -47,3 +47,10 @@ class UserService(BaseCrudService):
         user.save()
 
         return user
+    
+    @staticmethod
+    def get_all_users():
+
+        from accounts.models import CustomUser
+
+        return CustomUser.objects.all().order_by("-id")
