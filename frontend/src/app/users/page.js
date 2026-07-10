@@ -5,53 +5,74 @@ import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import UserTable from "@/components/users/UserTable";
 import UserSearch from "@/components/users/UserSearch";
-import { userService } from "@/services/user";
 import UserDetail from "@/components/users/UserDetail";
 import UserForm from "@/components/users/UserForm";
 
+import { userService } from "@/services/user";
+
+
 export default function UsersPage() {
 
+
   const [users, setUsers] = useState([]);
+
   const [search, setSearch] = useState("");
+
   const [loading, setLoading] = useState(true);
+
   const [selectedUser, setSelectedUser] = useState(null);
+
   const [openDetail, setOpenDetail] = useState(false);
+
   const [openForm, setOpenForm] = useState(false);
+
   const [editingUser, setEditingUser] = useState(null);
+
+
 
   const loadUsers = async () => {
 
-      try {
+    try {
 
-        setLoading(true);
+      setLoading(true);
 
-        const res = await userService.getAll();
+      const response = await userService.getAll();
 
-        if (res.success) {
 
-          setUsers(res.data);
+      if(response.success){
 
-        }
-
-      } catch (error) {
-
-        console.error("Erreur chargement utilisateurs :", error);
-
-      } finally {
-
-        setLoading(false);
+        setUsers(response.data || []);
 
       }
 
-    };
 
-    useEffect(() => {
+    } catch(error){
 
-      loadUsers();
+      console.error(
+        "Erreur chargement utilisateurs:",
+        error
+      );
 
-    }, []);
+    } finally {
 
-  const handleView = (user) => {
+      setLoading(false);
+
+    }
+
+  };
+
+
+
+  useEffect(()=>{
+
+    loadUsers();
+
+  },[]);
+
+
+
+
+  const handleView = (user)=>{
 
     setSelectedUser(user);
 
@@ -59,48 +80,107 @@ export default function UsersPage() {
 
   };
 
+
+
+
   const handleCreate = async (data) => {
+
+    const payload = { ...data };
+
+    delete payload.confirm_password;
 
     try {
 
-      const payload = { ...data };
+      if (editingUser) {
 
-      delete payload.confirm_password;
+        await userService.update(editingUser.id, payload);
 
-      await userService.create(payload);
+      } else {
+
+        await userService.create(payload);
+
+      }
 
       setOpenForm(false);
+
+      setEditingUser(null);
 
       await loadUsers();
 
     } catch (error) {
 
-      console.error("Erreur création utilisateur :", error);
+      throw error;
 
     }
 
   };
 
 
-  // Filtrage des utilisateurs
-  const filteredUsers = users.filter((user) => {
 
-    const searchText = search.toLowerCase();
+  const filteredUsers = users.filter((user)=>{
+
+
+    const text = search.toLowerCase();
+
 
     return (
-      user.username?.toLowerCase().includes(searchText) ||
-      user.first_name?.toLowerCase().includes(searchText) ||
-      user.last_name?.toLowerCase().includes(searchText) ||
-      user.email?.toLowerCase().includes(searchText)
+
+      user.username?.toLowerCase().includes(text)
+
+      ||
+
+      user.first_name?.toLowerCase().includes(text)
+
+      ||
+
+      user.last_name?.toLowerCase().includes(text)
+
+      ||
+
+      user.email?.toLowerCase().includes(text)
+
     );
 
+
   });
+
+  const handleEdit = (user) => {
+
+    setEditingUser(user);
+
+    setOpenForm(true);
+
+  };
+
+  const handleDelete = async (user) => {
+
+    if (!confirm(`Supprimer ${user.username} ?`)) {
+      return;
+    }
+
+    try {
+
+      await userService.delete(user.id);
+
+      await loadUsers();
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+
 
   return (
 
     <MainLayout>
 
+
       <div className="flex justify-between items-center mb-8">
+
 
         <div>
 
@@ -115,23 +195,40 @@ export default function UsersPage() {
         </div>
 
 
+
         <button
-          onClick={() => {
+
+          onClick={()=>{
+
             setEditingUser(null);
+
             setOpenForm(true);
+
           }}
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+
+          className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+
         >
+
           + Nouvel utilisateur
+
         </button>
+
 
       </div>
 
 
+
+
       <UserSearch
+
         value={search}
+
         onChange={setSearch}
+
       />
+
+
 
 
       {
@@ -140,7 +237,9 @@ export default function UsersPage() {
         (
 
           <div className="text-center py-20">
+
             Chargement...
+
           </div>
 
         )
@@ -148,27 +247,53 @@ export default function UsersPage() {
         :
 
         (
+
           <>
 
-            <UserTable
-              users={filteredUsers}
-              onView={handleView}
-            />
 
-            <UserDetail
-              open={openDetail}
-              user={selectedUser}
-              onClose={() => setOpenDetail(false)}
-            />
+          <UserTable
+            users={filteredUsers}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
 
-            <UserForm
-                open={openForm}
-                user={editingUser}
-                onClose={() => setOpenForm(false)}
-                onSubmit={handleCreate}
-            />
+
+
+          <UserDetail
+
+            open={openDetail}
+
+            user={selectedUser}
+
+            onClose={()=>setOpenDetail(false)}
+
+          />
+
+
+
+
+          <UserForm
+
+            open={openForm}
+
+            user={editingUser}
+
+            onClose={() => {
+
+              setOpenForm(false);
+
+              setEditingUser(null);
+
+            }}
+
+            onSubmit={handleCreate}
+
+          />
+
 
           </>
+
         )
 
       }

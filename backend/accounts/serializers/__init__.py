@@ -5,3 +5,4 @@ from .role import RoleSerializer
 from .role_permission import RolePermissionSerializer
 from .permission import PermissionSerializer
 from .user_create import UserCreateSerializer
+from .user_update import UserUpdateSerializer

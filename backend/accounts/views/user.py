@@ -2,25 +2,18 @@ from rest_framework import status
 from accounts.permissions import HasPermission
 from core.constants.permissions import Permissions
 from rest_framework.permissions import IsAuthenticated
-
 from core.base import BaseAPIView
 from core.responses import ApiResponse
-
-
-
 from accounts.serializers import (
     UserSerializer,
     UserCreateSerializer,
+    UserUpdateSerializer,
 )
 
 from accounts.services import UserService
 
-
 class UserListCreateView(BaseAPIView):
-    """
-    Liste et création des utilisateurs.
-    """
-
+  
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -65,10 +58,7 @@ class UserListCreateView(BaseAPIView):
             return [IsAuthenticated(), HasPermission()]
 
 class UserDetailView(BaseAPIView):
-    """
-    Détail, modification et suppression d'un utilisateur.
-    """
-
+  
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
@@ -86,7 +76,7 @@ class UserDetailView(BaseAPIView):
 
         user = UserService.get(pk)
 
-        serializer = UserCreateSerializer(
+        serializer = UserUpdateSerializer(
             user,
             data=request.data,
         )

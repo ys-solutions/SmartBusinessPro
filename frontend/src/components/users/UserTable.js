@@ -5,7 +5,9 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 export default function UserTable({
   users = [],
   onView,
-}) {
+  onEdit,
+  onDelete,
+})  {
   return (
     <div className="bg-white rounded-xl shadow overflow-hidden">
 
@@ -97,18 +99,21 @@ export default function UserTable({
                     </button>
 
                     <button
+                      onClick={() => onEdit(user)}
                       className="p-2 rounded-lg bg-yellow-100 hover:bg-yellow-200 text-yellow-600 transition"
                       title="Modifier"
                     >
                       <Pencil size={18} />
                     </button>
+                     
 
-                    <button
-                      className="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition"
-                      title="Supprimer"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                   <button
+                    onClick={() => onDelete(user)}
+                    className="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={18} />
+                  </button>
 
                   </div>
                 </td>

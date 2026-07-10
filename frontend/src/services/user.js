@@ -1,19 +1,23 @@
 import { api } from "./api";
 
 export const userService = {
-  async getAll() {
-    return await api.get("/auth/users/");
+  getAll() {
+    return api.get("/auth/users/");
   },
 
-  async create(data) {
-    return await api.post("/auth/users/", data);
+  get(id) {
+    return api.get(`/auth/users/${id}/`);
   },
 
-  async update(id, data) {
-    return await api.put(`/auth/users/${id}/`, data);
+  create(data) {
+    return api.post("/auth/users/", data);
   },
 
-  async delete(id) {
-    return await api.delete(`/auth/users/${id}/`);
+  update(id, data) {
+    return api.put(`/auth/users/${id}/`, data);
+  },
+
+  delete(id) {
+    return api.delete(`/auth/users/${id}/`);
   },
 };
