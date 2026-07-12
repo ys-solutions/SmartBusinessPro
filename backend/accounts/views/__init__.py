@@ -19,4 +19,5 @@ from .permission import (
 from .user import (
     UserListCreateView,
     UserDetailView,
+    UserPasswordView,
 )

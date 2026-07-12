@@ -3,304 +3,271 @@
 import { useEffect, useState } from "react";
 
 import MainLayout from "@/components/layout/MainLayout";
+
 import UserTable from "@/components/users/UserTable";
 import UserSearch from "@/components/users/UserSearch";
 import UserDetail from "@/components/users/UserDetail";
-import UserForm from "@/components/users/UserForm";
+import UserCreateForm from "@/components/users/UserCreateForm";
 
 import { userService } from "@/services/user";
 
-
 export default function UsersPage() {
 
+    const [users, setUsers] = useState([]);
 
-  const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  const [search, setSearch] = useState("");
+    const [search, setSearch] = useState("");
 
-  const [loading, setLoading] = useState(true);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-  const [selectedUser, setSelectedUser] = useState(null);
+    const [openDetail, setOpenDetail] = useState(false);
 
-  const [openDetail, setOpenDetail] = useState(false);
+    const [openCreate, setOpenCreate] = useState(false);
 
-  const [openForm, setOpenForm] = useState(false);
+    // Sera utilisé plus tard
+    const [openAccess, setOpenAccess] = useState(false);
 
-  const [editingUser, setEditingUser] = useState(null);
+    const [openPassword, setOpenPassword] = useState(false);
 
+    const loadUsers = async () => {
 
+        try {
 
-  const loadUsers = async () => {
+            setLoading(true);
 
-    try {
+            const response = await userService.getAll();
 
-      setLoading(true);
+            if (response.success) {
 
-      const response = await userService.getAll();
+                setUsers(response.data || []);
 
+            }
 
-      if(response.success){
+        } catch (error) {
 
-        setUsers(response.data || []);
+            console.error(error);
 
-      }
+        } finally {
 
+            setLoading(false);
 
-    } catch(error){
+        }
 
-      console.error(
-        "Erreur chargement utilisateurs:",
-        error
-      );
+    };
 
-    } finally {
+    useEffect(() => {
 
-      setLoading(false);
+        loadUsers();
 
-    }
+    }, []);
 
-  };
+    const handleCreate = async (data) => {
 
+        try {
 
+            await userService.create(data);
 
-  useEffect(()=>{
+            setOpenCreate(false);
 
-    loadUsers();
+            await loadUsers();
 
-  },[]);
+        } catch (error) {
 
+            throw error;
 
+        }
 
+    };
 
-  const handleView = (user)=>{
+    const handleView = (user) => {
 
-    setSelectedUser(user);
+        setSelectedUser(user);
 
-    setOpenDetail(true);
+        setOpenDetail(true);
 
-  };
+    };
 
+    // sera codé après
+    const handleAccess = (user) => {
 
+        setSelectedUser(user);
 
+        setOpenAccess(true);
 
-  const handleCreate = async (data) => {
+    };
 
-    const payload = { ...data };
+    // sera codé après
+    const handlePassword = (user) => {
 
-    delete payload.confirm_password;
+        setSelectedUser(user);
 
-    try {
+        setOpenPassword(true);
 
-      if (editingUser) {
+    };
 
-        await userService.update(editingUser.id, payload);
+    const handleDelete = async (user) => {
 
-      } else {
+        if (!confirm(`Supprimer ${user.username} ?`)) {
 
-        await userService.create(payload);
+            return;
 
-      }
+        }
 
-      setOpenForm(false);
+        try {
 
-      setEditingUser(null);
+            await userService.delete(user.id);
 
-      await loadUsers();
+            await loadUsers();
 
-    } catch (error) {
+        } catch (error) {
 
-      throw error;
+            console.error(error);
 
-    }
+        }
 
-  };
+    };
 
+    const filteredUsers = users.filter((user) => {
 
+        const text = search.toLowerCase();
 
-  const filteredUsers = users.filter((user)=>{
+        return (
 
+            user.username?.toLowerCase().includes(text) ||
 
-    const text = search.toLowerCase();
+            user.first_name?.toLowerCase().includes(text) ||
 
+            user.last_name?.toLowerCase().includes(text) ||
+
+            user.email?.toLowerCase().includes(text)
+
+        );
+
+    });
 
     return (
 
-      user.username?.toLowerCase().includes(text)
+        <MainLayout>
 
-      ||
+            <div className="flex justify-between items-center mb-8">
 
-      user.first_name?.toLowerCase().includes(text)
+                <div>
 
-      ||
+                    <h1 className="text-3xl font-bold">
 
-      user.last_name?.toLowerCase().includes(text)
+                        Gestion des utilisateurs
 
-      ||
+                    </h1>
 
-      user.email?.toLowerCase().includes(text)
+                    <p className="text-gray-500 mt-2">
+
+                        Liste des utilisateurs du système.
+
+                    </p>
+
+                </div>
+
+                <button
+
+                    onClick={() => setOpenCreate(true)}
+
+                    className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+
+                >
+
+                    + Nouvel utilisateur
+
+                </button>
+
+            </div>
+
+            <UserSearch
+
+                value={search}
+
+                onChange={setSearch}
+
+            />
+
+            {
+
+                loading ?
+
+                    (
+
+                        <div className="text-center py-20">
+
+                            Chargement...
+
+                        </div>
+
+                    )
+
+                    :
+
+                    (
+
+                        <>
+
+                            <UserTable
+
+                                users={filteredUsers}
+
+                                onView={handleView}
+
+                                onAccess={handleAccess}
+
+                                onPassword={handlePassword}
+
+                                onDelete={handleDelete}
+
+                            />
+
+                            <UserDetail
+
+                                open={openDetail}
+
+                                user={selectedUser}
+
+                                onClose={() => setOpenDetail(false)}
+
+                            />
+
+                            <UserCreateForm
+
+                                open={openCreate}
+
+                                onClose={() => setOpenCreate(false)}
+
+                                onSubmit={handleCreate}
+
+                            />
+
+                            {/*
+
+                                UserAccessForm
+
+                                sera ajouté ici
+
+                            */}
+
+                            {/*
+
+                                UserPasswordForm
+
+                                sera ajouté ici
+
+                            */}
+
+                        </>
+
+                    )
+
+            }
+
+        </MainLayout>
 
     );
-
-
-  });
-
-  const handleEdit = (user) => {
-
-    setEditingUser(user);
-
-    setOpenForm(true);
-
-  };
-
-  const handleDelete = async (user) => {
-
-    if (!confirm(`Supprimer ${user.username} ?`)) {
-      return;
-    }
-
-    try {
-
-      await userService.delete(user.id);
-
-      await loadUsers();
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-  };
-
-
-
-  return (
-
-    <MainLayout>
-
-
-      <div className="flex justify-between items-center mb-8">
-
-
-        <div>
-
-          <h1 className="text-3xl font-bold">
-            Gestion des utilisateurs
-          </h1>
-
-          <p className="text-gray-500 mt-2">
-            Liste des utilisateurs du système
-          </p>
-
-        </div>
-
-
-
-        <button
-
-          onClick={()=>{
-
-            setEditingUser(null);
-
-            setOpenForm(true);
-
-          }}
-
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg"
-
-        >
-
-          + Nouvel utilisateur
-
-        </button>
-
-
-      </div>
-
-
-
-
-      <UserSearch
-
-        value={search}
-
-        onChange={setSearch}
-
-      />
-
-
-
-
-      {
-        loading ?
-
-        (
-
-          <div className="text-center py-20">
-
-            Chargement...
-
-          </div>
-
-        )
-
-        :
-
-        (
-
-          <>
-
-
-          <UserTable
-            users={filteredUsers}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-
-
-
-          <UserDetail
-
-            open={openDetail}
-
-            user={selectedUser}
-
-            onClose={()=>setOpenDetail(false)}
-
-          />
-
-
-
-
-          <UserForm
-
-            open={openForm}
-
-            user={editingUser}
-
-            onClose={() => {
-
-              setOpenForm(false);
-
-              setEditingUser(null);
-
-            }}
-
-            onSubmit={handleCreate}
-
-          />
-
-
-          </>
-
-        )
-
-      }
-
-
-    </MainLayout>
-
-  );
 
 }

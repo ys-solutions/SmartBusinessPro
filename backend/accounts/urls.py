@@ -18,6 +18,7 @@ from accounts.views import (
 from accounts.views import (
     UserListCreateView,
     UserDetailView,
+    UserPasswordView,
 )
 
 urlpatterns = [
@@ -38,4 +39,6 @@ urlpatterns = [
 
     path("users/",UserListCreateView.as_view(),name="user-list",),
     path("users/<int:pk>/",UserDetailView.as_view(),name="user-detail",),
+
+    path("users/<int:pk>/change-password/",UserPasswordView.as_view(),name="user-change-password",),
 ]

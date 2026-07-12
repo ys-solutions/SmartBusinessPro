@@ -11,10 +11,19 @@ from accounts.serializers import (
 )
 
 from accounts.services import UserService
+from accounts.serializers import UserPasswordSerializer
+from django.shortcuts import get_object_or_404
+from accounts.models import CustomUser
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class UserListCreateView(BaseAPIView):
   
     permission_classes = [IsAuthenticated]
+
+    parser_classes = (
+        MultiPartParser,
+        FormParser,
+    )
 
     def get(self, request):
 
@@ -23,6 +32,7 @@ class UserListCreateView(BaseAPIView):
         serializer = UserSerializer(
             users,
             many=True,
+            context={"request": request},
         )
 
         return ApiResponse.success(
@@ -61,15 +71,27 @@ class UserDetailView(BaseAPIView):
   
     permission_classes = [IsAuthenticated]
 
+    parser_classes = (
+        MultiPartParser,
+        FormParser,
+    )
+
+
     def get(self, request, pk):
 
         user = UserService.get(pk)
 
-        serializer = UserSerializer(user)
+        serializer = UserSerializer(
+            user,
+            context={"request": request},
+        )
 
         return ApiResponse.success(
             message="Détail de l'utilisateur.",
-            data=serializer.data,
+            data=UserSerializer(
+                user,
+                context={"request": request},
+            ).data,
         )
 
     def put(self, request, pk):
@@ -114,3 +136,39 @@ class UserDetailView(BaseAPIView):
             self.permission_required = Permissions.USER_DELETE
 
         return [IsAuthenticated(), HasPermission()]
+    
+
+class UserPasswordView(BaseAPIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+
+        user = UserService.get(pk)
+
+        serializer = UserPasswordSerializer(
+            data=request.data,
+        )
+
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        user.set_password(
+            serializer.validated_data["password"]
+        )
+
+        user.save()
+
+        return ApiResponse.success(
+            message="Mot de passe modifié avec succès.",
+        )
+
+    def get_permissions(self):
+
+        self.permission_required = Permissions.USER_UPDATE
+
+        return [
+            IsAuthenticated(),
+            HasPermission(),
+        ]
