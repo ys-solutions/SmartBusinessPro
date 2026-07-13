@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 
 import MainLayout from "@/components/layout/MainLayout";
-
 import UserTable from "@/components/users/UserTable";
 import UserSearch from "@/components/users/UserSearch";
 import UserDetail from "@/components/users/UserDetail";
 import UserCreateForm from "@/components/users/UserCreateForm";
-
 import { userService } from "@/services/user";
+import UserAccessForm from "@/components/users/UserAccessForm";
+import { userAccessService } from "@/services/userAccess";
+
 
 export default function UsersPage() {
 
@@ -29,6 +30,8 @@ export default function UsersPage() {
     const [openAccess, setOpenAccess] = useState(false);
 
     const [openPassword, setOpenPassword] = useState(false);
+
+    const [accessUser, setAccessUser] = useState(null);
 
     const loadUsers = async () => {
 
@@ -88,12 +91,35 @@ export default function UsersPage() {
 
     };
 
-    // sera codé après
     const handleAccess = (user) => {
 
-        setSelectedUser(user);
+        setAccessUser(user);
 
         setOpenAccess(true);
+
+    };
+
+
+    const handleAccessSave = async (data) => {
+
+        try {
+
+            await userAccessService.update(
+                accessUser.id,
+                data,
+            );
+
+            setOpenAccess(false);
+
+            setAccessUser(null);
+
+            await loadUsers();
+
+        } catch (error) {
+
+            throw error;
+
+        }
 
     };
 
@@ -211,17 +237,11 @@ export default function UsersPage() {
                         <>
 
                             <UserTable
-
                                 users={filteredUsers}
-
                                 onView={handleView}
-
                                 onAccess={handleAccess}
-
                                 onPassword={handlePassword}
-
                                 onDelete={handleDelete}
-
                             />
 
                             <UserDetail
@@ -244,13 +264,22 @@ export default function UsersPage() {
 
                             />
 
-                            {/*
+                            {
 
-                                UserAccessForm
+                                <UserAccessForm
+                                    open={openAccess}
+                                    user={accessUser}
+                                    onClose={() => {
 
-                                sera ajouté ici
+                                        setOpenAccess(false);
 
-                            */}
+                                        setAccessUser(null);
+
+                                    }}
+                                    onSubmit={handleAccessSave}
+                                />
+
+                            }
 
                             {/*
 

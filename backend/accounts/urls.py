@@ -1,8 +1,12 @@
 from django.urls import path
 
-from accounts.views import LoginView, RegisterView
-from accounts.views import MeView
-from accounts.views import LogoutView
+from accounts.views import ( 
+    LoginView, 
+    RegisterView,
+    MeView,
+    ProfileView,
+    LogoutView
+)
 
 from accounts.views import (
     RoleListCreateView,
@@ -19,13 +23,16 @@ from accounts.views import (
     UserListCreateView,
     UserDetailView,
     UserPasswordView,
+    UserAccessView,
 )
+
 
 urlpatterns = [
     # Auth
     path("login/", LoginView.as_view(), name="login"),
     path("register/", RegisterView.as_view(), name="register"),
     path("me/", MeView.as_view(), name="me"),
+    path("profile/", ProfileView.as_view(), name="profile"),
     path("logout/", LogoutView.as_view(), name="logout"),
 
     # Roles
@@ -41,4 +48,6 @@ urlpatterns = [
     path("users/<int:pk>/",UserDetailView.as_view(),name="user-detail",),
 
     path("users/<int:pk>/change-password/",UserPasswordView.as_view(),name="user-change-password",),
+
+    path("users/<int:pk>/access/",UserAccessView.as_view(),name="user-access",),
 ]

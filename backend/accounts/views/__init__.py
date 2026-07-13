@@ -21,3 +21,7 @@ from .user import (
     UserDetailView,
     UserPasswordView,
 )
+
+from .user_access import UserAccessView
+
+from .profile import ProfileView

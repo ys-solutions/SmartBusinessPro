@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 from .managers import CustomUserManager
 
@@ -38,6 +39,27 @@ class CustomUser(AbstractUser):
 
     updated_at = models.DateTimeField(
         auto_now=True
+    )
+
+    must_change_password = models.BooleanField(
+        default=True,
+        verbose_name="Doit changer son mot de passe",
+    )
+
+    is_locked = models.BooleanField(
+        default=False,
+        verbose_name="Compte verrouillé",
+    )
+
+    failed_login_attempts = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Nombre d'échecs de connexion",
+    )
+
+    password_changed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Dernier changement de mot de passe",
     )
 
     # Gestionnaire personnalisé
