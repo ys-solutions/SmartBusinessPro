@@ -36,7 +36,7 @@ export default function LoginPage() {
 
     try {
       await authService.login(data);
-      router.push("/dashboard");
+      router.push("/home");
     } catch {
       setServerError(
         "Nom d'utilisateur ou mot de passe incorrect."

@@ -1,24 +1,50 @@
 "use client";
 
-import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
+import { useState } from "react";
+
+import Sidebar from "./sidebar/Sidebar";
+import Header from "./header/Header";
 
 export default function MainLayout({ children }) {
-  return (
-    <div className="min-h-screen bg-gray-100">
 
-      <Sidebar />
+    const [collapsed, setCollapsed] = useState(false);
 
-      <div className="ml-64 flex flex-col min-h-screen">
+    return (
 
-        <Navbar />
+        <div className="min-h-screen bg-gray-100">
 
-        <main className="flex-1 p-8">
-          {children}
-        </main>
+            <Sidebar
+                collapsed={collapsed}
+                setCollapsed={setCollapsed}
+            />
 
-      </div>
+            <div
+                className={`
+                    transition-all
+                    duration-300
+                    ${
+                        collapsed
+                            ? "ml-20"
+                            : "ml-72"
+                    }
+                `}
+            >
 
-    </div>
-  );
+                <Header
+                    collapsed={collapsed}
+                    setCollapsed={setCollapsed}
+                />
+
+                <main className="p-8">
+
+                    {children}
+
+                </main>
+
+            </div>
+
+        </div>
+
+    );
+
 }
