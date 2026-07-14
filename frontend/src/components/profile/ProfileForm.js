@@ -129,27 +129,22 @@ export default function ProfileForm({
                 <div className="flex flex-col items-center">
 
                     <ImageUpload
-
                         value={watch("photo")}
-
-                        onChange={(file) =>
-
-                            setValue("photo", file)
-                        }
-
+                        onChange={(file)=>setValue("photo",file)}
+                        error={serverErrors.photo?.[0]}
                     />
 
-                    <h2 className="mt-4 text-2xl font-semibold">
-
-                        {user.username}
-
+                    <h2 className="mt-4 text-2xl font-bold">
+                        {user.first_name} {user.last_name}
                     </h2>
 
-                    <p className="text-gray-500">
-
-                        {user.role?.name || "-"}
-
+                    <p className="text-gray-500 mt-1">
+                        @{user.username}
                     </p>
+
+                    <span className="mt-3 inline-flex rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-700">
+                        {user.role?.name}
+                    </span>
 
                 </div>
 
@@ -163,7 +158,7 @@ export default function ProfileForm({
 
                 </h3>
 
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                     <Input
                         label="Prénom"
@@ -217,7 +212,7 @@ export default function ProfileForm({
 
                 </h3>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                     <div className="flex items-center gap-3">
 
@@ -314,10 +309,11 @@ export default function ProfileForm({
 
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-8">
 
                 <Button
                     type="submit"
+                    className="min-w-56"
                 >
                     Enregistrer les modifications
                 </Button>

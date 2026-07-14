@@ -1,14 +1,10 @@
-import api from "@/services/api";
+import { api } from "@/services/api";
 
 export const profileService = {
 
     async get() {
 
-        const { data } = await api.get(
-            "/auth/profile/"
-        );
-
-        return data;
+        return await api.get("/auth/profile/");
 
     },
 
@@ -26,17 +22,10 @@ export const profileService = {
 
         });
 
-        const { data } = await api.put(
+        return await api.put(
             "/auth/profile/",
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            },
+            formData
         );
-
-        return data;
 
     },
 

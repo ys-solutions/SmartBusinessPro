@@ -18,7 +18,7 @@ const menu = [
     {
         title: "Accueil",
         icon: Home,
-        href: "/",
+        href: "/home",
     },
     {
         title: "Tableau de bord",

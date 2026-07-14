@@ -14,23 +14,19 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
 
     const loadProfile = async () => {
-
         try {
+            setLoading(true);
 
             const response = await profileService.get();
 
             if (response.success) {
-
                 setProfile(response.data);
-
             }
-
+        } catch (error) {
+            console.error("Erreur chargement profil :", error);
         } finally {
-
             setLoading(false);
-
         }
-
     };
 
     useEffect(() => {
@@ -40,11 +36,13 @@ export default function ProfilePage() {
     }, []);
 
     const handleSubmit = async (data) => {
-
-        await profileService.update(data);
-
-        await loadProfile();
-
+        try {
+            await profileService.update(data);
+            await loadProfile();
+        } catch (error) {
+            console.error("Erreur mise à jour profil :", error);
+            throw error;
+        }
     };
 
     if (loading) {
