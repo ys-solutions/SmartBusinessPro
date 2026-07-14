@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Camera, Trash2 } from "lucide-react";
 
-const DEFAULT_IMAGE = "/images/avatar.png";
+const DEFAULT_IMAGE = "/images/avatar.jpg";
 
 export default function ImageUpload({
     value,
@@ -27,11 +27,17 @@ export default function ImageUpload({
 
         if (typeof value === "string") {
 
-            setPreview(value);
+            const MEDIA_URL = "http://127.0.0.1:8000";
+
+            setPreview(
+                value.startsWith("http")
+                    ? value
+                    : `${MEDIA_URL}${value.startsWith("/") ? "" : "/"}${value}`
+            );
 
             return;
 
-        }
+    }
 
         const url = URL.createObjectURL(value);
 
