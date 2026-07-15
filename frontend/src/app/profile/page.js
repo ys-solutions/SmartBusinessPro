@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Button from "@/components/ui/Button";
 
 import MainLayout from "@/components/layout/MainLayout";
 import ProfileForm from "@/components/profile/ProfileForm";
@@ -16,6 +17,8 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState(null);
 
     const [loading, setLoading] = useState(true);
+
+    const [showPasswordForm, setShowPasswordForm] = useState(false);
 
     const loadProfile = async () => {
         try {
@@ -103,11 +106,41 @@ export default function ProfilePage() {
 
             <div className="mt-8">
 
-                <ChangePasswordForm
-                onSubmit={handlePassword}
-            />
+                <div className="flex justify-end">
 
-</div>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() =>
+                            setShowPasswordForm(!showPasswordForm)
+                        }
+                    >
+                        {
+                            showPasswordForm
+                                ? "Fermer"
+                                : "Changer mon mot de passe"
+                        }
+                    </Button>
+
+                </div>
+
+                {
+                    showPasswordForm && (
+
+                        <div className="mt-6">
+
+                            <ChangePasswordForm
+                                onSubmit={handlePassword}
+                            />
+
+                        </div>
+
+                    )
+                }
+
+            </div>
+
+
 
         </MainLayout>
 

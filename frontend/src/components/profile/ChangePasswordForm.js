@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "@/components/ui/Button";
@@ -7,11 +8,15 @@ import Input from "@/components/ui/Input";
 
 import { Lock } from "lucide-react";
 
+
+
 export default function ChangePasswordForm({
 
     onSubmit,
 
 }) {
+
+    const [serverErrors, setServerErrors] = useState({});
 
     const {
 
@@ -37,9 +42,21 @@ export default function ChangePasswordForm({
 
                 onSubmit={handleSubmit(async (data) => {
 
-                    await onSubmit(data);
+                    try {
 
-                    reset();
+                        setServerErrors({});
+
+                        await onSubmit(data);
+
+                        reset();
+
+                    } catch (error) {
+
+                        setServerErrors(
+                            error.errors || error
+                        );
+
+                    }
 
                 })}
 
@@ -51,6 +68,7 @@ export default function ChangePasswordForm({
                     type="password"
                     label="Mot de passe actuel"
                     icon={Lock}
+                    error={serverErrors.current_password?.[0]}
                     {...register("current_password")}
                 />
 
@@ -58,6 +76,7 @@ export default function ChangePasswordForm({
                     type="password"
                     label="Nouveau mot de passe"
                     icon={Lock}
+                    error={serverErrors.new_password?.[0]}
                     {...register("new_password")}
                 />
 
@@ -65,6 +84,7 @@ export default function ChangePasswordForm({
                     type="password"
                     label="Confirmation"
                     icon={Lock}
+                    error={serverErrors.confirm_password?.[0]}
                     {...register("confirm_password")}
                 />
 

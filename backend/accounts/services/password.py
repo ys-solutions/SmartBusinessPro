@@ -1,4 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 from rest_framework.exceptions import ValidationError
 
 from accounts.models import CustomUser
@@ -25,7 +27,18 @@ class PasswordService:
             })
 
         # Validation Django
-        validate_password(new_password, user)
+        try:
+
+            validate_password(
+                new_password,
+                user,
+            )
+
+        except DjangoValidationError as e:
+
+            raise ValidationError({
+                "new_password": e.messages
+            })
 
         # Mise à jour
         user.set_password(new_password)
