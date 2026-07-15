@@ -7,6 +7,10 @@ import ProfileForm from "@/components/profile/ProfileForm";
 
 import { profileService } from "@/services/profile";
 
+import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
+
+import { passwordService } from "@/services/password";
+
 export default function ProfilePage() {
 
     const [profile, setProfile] = useState(null);
@@ -43,6 +47,14 @@ export default function ProfilePage() {
             console.error("Erreur mise à jour profil :", error);
             throw error;
         }
+    };
+
+    const handlePassword = async (data) => {
+
+        await passwordService.change(data);
+
+        alert("Mot de passe modifié avec succès.");
+
     };
 
     if (loading) {
@@ -88,6 +100,14 @@ export default function ProfilePage() {
                 user={profile}
                 onSubmit={handleSubmit}
             />
+
+            <div className="mt-8">
+
+                <ChangePasswordForm
+                onSubmit={handlePassword}
+            />
+
+</div>
 
         </MainLayout>
 

@@ -27,7 +27,7 @@ export default function ImageUpload({
 
         if (typeof value === "string") {
 
-            const MEDIA_URL = "http://127.0.0.1:8000";
+            const MEDIA_URL = process.env.NEXT_PUBLIC_API_URL;
 
             setPreview(
                 value.startsWith("http")

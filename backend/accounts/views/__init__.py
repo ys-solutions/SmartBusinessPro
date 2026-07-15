@@ -25,3 +25,5 @@ from .user import (
 from .user_access import UserAccessView
 
 from .profile import ProfileView
+
+from .password import PasswordView

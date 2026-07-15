@@ -9,3 +9,4 @@ from .user_update import UserUpdateSerializer
 from .user_password import UserPasswordSerializer
 from .user_access_serializer import UserAccessSerializer
 from .profile import ProfileSerializer
+from .password import ChangePasswordSerializer
