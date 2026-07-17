@@ -2,11 +2,15 @@ from core.base import BaseModelSerializer
 
 from accounts.models import CustomUser
 
+from accounts.serializers.role import RoleSerializer
+
 
 class ProfileSerializer(BaseModelSerializer):
     """
     Serializer du profil utilisateur connecté.
     """
+
+    role = RoleSerializer(read_only=True)
 
     class Meta:
 

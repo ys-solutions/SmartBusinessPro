@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import Modal from "@/components/ui/Modal";
+import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 
-import Image from "next/image";
+import { passwordService } from "@/services/password";
+
+import toast from "react-hot-toast";
+
+import { useEffect, useRef, useState } from "react";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import {
     Bell,
@@ -13,42 +20,115 @@ import {
     LogOut,
 } from "lucide-react";
 
+import { profileService } from "@/services/profile";
+import { authService } from "@/services/auth";
+
 export default function Header() {
 
-    const [open, setOpen] = useState(false);
+    const router = useRouter();
 
     const menuRef = useRef(null);
 
+    const [open, setOpen] = useState(false);
+
+    const [user, setUser] = useState(null);
+
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
+
     useEffect(() => {
 
-        function handleClickOutside(event) {
+        loadProfile();
+
+    }, []);
+
+    const loadProfile = async () => {
+
+        try {
+
+            const res = await profileService.get();
+
+            if (res.success) {
+
+                setUser(res.data);
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    };
+
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
 
             if (
                 menuRef.current &&
                 !menuRef.current.contains(event.target)
             ) {
+
                 setOpen(false);
+
             }
 
-        }
+        };
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
 
-        return () =>
+        return () => {
+
             document.removeEventListener(
                 "mousedown",
                 handleClickOutside
             );
 
+        };
+
     }, []);
+
+    const logout = () => {
+
+        authService.logout();
+
+        router.replace("/login");
+
+    };
+
+    const handlePassword = async (data) => {
+
+        try {
+
+            await passwordService.change(data);
+
+            toast.success(
+                "Mot de passe modifié avec succès."
+            );
+
+            setOpenPasswordModal(false);
+
+        } catch (error) {
+
+            throw error;
+
+        }
+
+    };
+
+    const photo = user?.photo
+        ? `${process.env.NEXT_PUBLIC_API_URL}${user.photo}`
+        : "/images/avatar.jpg";
+
 
     return (
 
         <header className="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 shadow-sm">
 
             <div className="h-full flex items-center justify-between px-8">
-
-                {/* Recherche */}
 
                 <div className="w-96">
 
@@ -60,25 +140,13 @@ export default function Header() {
 
                 </div>
 
-                {/* Partie droite */}
-
                 <div className="flex items-center gap-6">
 
-                    {/* Notifications */}
-
-                    <button className="relative rounded-lg p-2 hover:bg-gray-100 transition">
+                    <button className="relative rounded-lg p-2 hover:bg-gray-100">
 
                         <Bell size={22} />
 
-                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-
-                            3
-
-                        </span>
-
                     </button>
-
-                    {/* Utilisateur */}
 
                     <div
                         ref={menuRef}
@@ -87,28 +155,28 @@ export default function Header() {
 
                         <button
                             onClick={() => setOpen(!open)}
-                            className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-gray-100 transition"
+                            className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-gray-100"
                         >
 
-                            <Image
-                                src="/images/avatar.jpg"
+                            <img
+                                src={photo}
                                 alt="Utilisateur"
-                                width={40}
-                                height={40}
-                                className="rounded-full border"
-                            />
+                                className="w-10 h-10 rounded-full border object-cover"
+                            />      
 
                             <div className="text-left">
 
                                 <p className="text-sm font-semibold">
 
-                                    Administrateur
+                                    {user
+                                        ? `${user.first_name} ${user.last_name}`
+                                        : "Chargement..."}
 
                                 </p>
 
                                 <p className="text-xs text-gray-500">
 
-                                    admin
+                                    {user?.role?.name || "-"}
 
                                 </p>
 
@@ -116,64 +184,80 @@ export default function Header() {
 
                         </button>
 
-                        {open && (
+                        {
+                            open && (
 
-                            <div className="absolute right-0 mt-2 w-64 rounded-xl border bg-white shadow-xl overflow-hidden">
+                                <div className="absolute right-0 mt-2 w-64 rounded-xl border bg-white shadow-xl overflow-hidden">
 
-                                <Link
-                                    href="/profile"
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
-                                >
+                                    <Link
+                                        href="/profile"
+                                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+                                    >
 
-                                    <User size={18} />
+                                        <User size={18} />
 
-                                    Mon profil
+                                        Mon profil
 
-                                </Link>
+                                    </Link>
 
-                                <Link
-                                    href="/profile/password"
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
-                                >
+                                    <button
+                                        onClick={() => {
+                                            setOpen(false);
+                                            setOpenPasswordModal(true);
+                                        }}
+                                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-gray-100"
+                                    >
+                                        <KeyRound size={18} />
 
-                                    <KeyRound size={18} />
+                                        Changer le mot de passe
 
-                                    Changer le mot de passe
+                                    </button>
 
-                                </Link>
+                                    <Link
+                                        href="/settings"
+                                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+                                    >
 
-                                <Link
-                                    href="/settings"
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
-                                >
+                                        <Settings size={18} />
 
-                                    <Settings size={18} />
+                                        Paramètres
 
-                                    Paramètres
+                                    </Link>
 
-                                </Link>
+                                    <hr />
 
-                                <hr />
+                                    <button
+                                        onClick={logout}
+                                        className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
+                                    >
 
-                                <button
-                                    className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
-                                >
+                                        <LogOut size={18} />
 
-                                    <LogOut size={18} />
+                                        Déconnexion
 
-                                    Déconnexion
+                                    </button>
 
-                                </button>
+                                </div>
 
-                            </div>
-
-                        )}
+                            )
+                        }
 
                     </div>
 
                 </div>
 
             </div>
+
+            <Modal
+                open={openPasswordModal}
+                onClose={() => setOpenPasswordModal(false)}
+                title="Modifier le mot de passe"
+                width="max-w-xl"
+            >
+                <ChangePasswordForm
+                    onSubmit={handlePassword}
+                />
+            </Modal>
 
         </header>
 

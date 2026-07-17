@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Button from "@/components/ui/Button";
 
 import MainLayout from "@/components/layout/MainLayout";
+
 import ProfileForm from "@/components/profile/ProfileForm";
-
-import { profileService } from "@/services/profile";
-
 import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 
+import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
+
+import { profileService } from "@/services/profile";
 import { passwordService } from "@/services/password";
+
+import toast from "react-hot-toast";
 
 export default function ProfilePage() {
 
@@ -18,22 +21,35 @@ export default function ProfilePage() {
 
     const [loading, setLoading] = useState(true);
 
-    const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
     const loadProfile = async () => {
+
         try {
+
             setLoading(true);
 
             const response = await profileService.get();
 
             if (response.success) {
+
                 setProfile(response.data);
+
             }
+
         } catch (error) {
-            console.error("Erreur chargement profil :", error);
+
+            console.error(
+                "Erreur chargement profil :",
+                error
+            );
+
         } finally {
+
             setLoading(false);
+
         }
+
     };
 
     useEffect(() => {
@@ -43,20 +59,49 @@ export default function ProfilePage() {
     }, []);
 
     const handleSubmit = async (data) => {
+
         try {
+
             await profileService.update(data);
+
+            toast.success(
+                "Profil mis à jour avec succès."
+            );
+
             await loadProfile();
+
         } catch (error) {
-            console.error("Erreur mise à jour profil :", error);
+
+            console.error(error);
+
+            toast.error(
+                error.message ||
+                "Erreur lors de la mise à jour."
+            );
+
             throw error;
+
         }
+
     };
 
     const handlePassword = async (data) => {
 
-        await passwordService.change(data);
+        try {
 
-        alert("Mot de passe modifié avec succès.");
+            await passwordService.change(data);
+
+            toast.success(
+                "Mot de passe modifié avec succès."
+            );
+
+            setOpenPasswordModal(false);
+
+        } catch (error) {
+
+            throw error;
+
+        }
 
     };
 
@@ -98,49 +143,10 @@ export default function ProfilePage() {
 
             </div>
 
-
             <ProfileForm
                 user={profile}
                 onSubmit={handleSubmit}
             />
-
-            <div className="mt-8">
-
-                <div className="flex justify-end">
-
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() =>
-                            setShowPasswordForm(!showPasswordForm)
-                        }
-                    >
-                        {
-                            showPasswordForm
-                                ? "Fermer"
-                                : "Changer mon mot de passe"
-                        }
-                    </Button>
-
-                </div>
-
-                {
-                    showPasswordForm && (
-
-                        <div className="mt-6">
-
-                            <ChangePasswordForm
-                                onSubmit={handlePassword}
-                            />
-
-                        </div>
-
-                    )
-                }
-
-            </div>
-
-
 
         </MainLayout>
 
