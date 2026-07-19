@@ -1,12 +1,5 @@
 "use client";
 
-import Modal from "@/components/ui/Modal";
-import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
-
-import { passwordService } from "@/services/password";
-
-import toast from "react-hot-toast";
-
 import { useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
@@ -20,8 +13,14 @@ import {
     LogOut,
 } from "lucide-react";
 
+import Modal from "@/components/ui/Modal";
+import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
+
 import { profileService } from "@/services/profile";
 import { authService } from "@/services/auth";
+import { passwordService } from "@/services/password";
+
+import toast from "react-hot-toast";
 
 export default function Header() {
 
@@ -29,10 +28,10 @@ export default function Header() {
 
     const menuRef = useRef(null);
 
-    const [open, setOpen] = useState(false);
-
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
+    const [open, setOpen] = useState(false);
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
     useEffect(() => {
@@ -45,16 +44,23 @@ export default function Header() {
 
         try {
 
-            const res = await profileService.get();
+            const response = await profileService.get();
 
-            if (res.success) {
+            console.log("PROFILE =", response);
 
-                setUser(res.data);
+            if (response.success) {
+
+                setUser(response.data);
+
             }
 
         } catch (error) {
 
             console.error(error);
+
+        } finally {
+
+            setLoading(false);
 
         }
 
@@ -80,14 +86,11 @@ export default function Header() {
             handleClickOutside
         );
 
-        return () => {
-
+        return () =>
             document.removeEventListener(
                 "mousedown",
                 handleClickOutside
             );
-
-        };
 
     }, []);
 
@@ -119,10 +122,17 @@ export default function Header() {
 
     };
 
+    if (loading) {
+
+        return (
+            <header className="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 shadow-sm" />
+        );
+
+    }
+
     const photo = user?.photo
         ? `${process.env.NEXT_PUBLIC_API_URL}${user.photo}`
         : "/images/avatar.jpg";
-
 
     return (
 
@@ -162,7 +172,7 @@ export default function Header() {
                                 src={photo}
                                 alt="Utilisateur"
                                 className="w-10 h-10 rounded-full border object-cover"
-                            />      
+                            />
 
                             <div className="text-left">
 
@@ -170,13 +180,15 @@ export default function Header() {
 
                                     {user
                                         ? `${user.first_name} ${user.last_name}`
-                                        : "Chargement..."}
+                                        : "Utilisateur"}
 
                                 </p>
 
                                 <p className="text-xs text-gray-500">
 
-                                    {user?.role?.name || "-"}
+                                    {typeof user?.role === "object"
+                                        ? user.role.name
+                                        : user?.role}
 
                                 </p>
 
@@ -184,63 +196,67 @@ export default function Header() {
 
                         </button>
 
-                        {
-                            open && (
+                        {open && (
 
-                                <div className="absolute right-0 mt-2 w-64 rounded-xl border bg-white shadow-xl overflow-hidden">
+                            <div className="absolute right-0 mt-2 w-64 rounded-xl border bg-white shadow-xl overflow-hidden">
 
-                                    <Link
-                                        href="/profile"
-                                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
-                                    >
+                                <Link
+                                    href="/profile"
+                                    onClick={() => setOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+                                >
 
-                                        <User size={18} />
+                                    <User size={18} />
 
-                                        Mon profil
+                                    Mon profil
 
-                                    </Link>
+                                </Link>
 
-                                    <button
-                                        onClick={() => {
-                                            setOpen(false);
-                                            setOpenPasswordModal(true);
-                                        }}
-                                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-gray-100"
-                                    >
-                                        <KeyRound size={18} />
+                                <button
+                                    onClick={() => {
 
-                                        Changer le mot de passe
+                                        setOpen(false);
 
-                                    </button>
+                                        setOpenPasswordModal(true);
 
-                                    <Link
-                                        href="/settings"
-                                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
-                                    >
+                                    }}
+                                    className="flex w-full items-center gap-3 px-4 py-3 hover:bg-gray-100"
+                                >
 
-                                        <Settings size={18} />
+                                    <KeyRound size={18} />
 
-                                        Paramètres
+                                    Changer le mot de passe
 
-                                    </Link>
+                                </button>
 
-                                    <hr />
+                                <Link
+                                    href="/settings"
+                                    onClick={() => setOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+                                >
 
-                                    <button
-                                        onClick={logout}
-                                        className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
-                                    >
+                                    <Settings size={18} />
 
-                                        <LogOut size={18} />
+                                    Paramètres
 
-                                        Déconnexion
+                                </Link>
 
-                                    </button>
+                                <hr />
 
-                                </div>
+                                <button
+                                    onClick={logout}
+                                    className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
+                                >
 
-                            )
-                        }
+                                    <LogOut size={18} />
+
+                                    Déconnexion
+
+                                </button>
+
+                            </div>
+
+                        )}
 
                     </div>
 
@@ -254,9 +270,11 @@ export default function Header() {
                 title="Modifier le mot de passe"
                 width="max-w-xl"
             >
+
                 <ChangePasswordForm
                     onSubmit={handlePassword}
                 />
+
             </Modal>
 
         </header>

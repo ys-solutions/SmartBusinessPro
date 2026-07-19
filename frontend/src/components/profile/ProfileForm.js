@@ -54,6 +54,10 @@ export default function ProfileForm({
 
 }) {
 
+    if (!user) {
+        return null;
+    }
+
     const [serverErrors, setServerErrors] = useState({});
 
     const {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Sidebar from "./sidebar/Sidebar";
 import Header from "./header/Header";
 
@@ -11,39 +11,34 @@ export default function MainLayout({ children }) {
 
     return (
 
-        <div className="min-h-screen bg-gray-100">
+        <ProtectedRoute>
 
-            <Sidebar
-                collapsed={collapsed}
-                setCollapsed={setCollapsed}
-            />
+            <div className="min-h-screen bg-gray-100">
 
-            <div
-                className={`
-                    transition-all
-                    duration-300
-                    ${
-                        collapsed
-                            ? "ml-20"
-                            : "ml-72"
-                    }
-                `}
-            >
-
-                <Header
+                <Sidebar
                     collapsed={collapsed}
                     setCollapsed={setCollapsed}
                 />
 
-                <main className="p-8">
+                <div
+                    className={`transition-all duration-300 ${
+                        collapsed ? "ml-20" : "ml-72"
+                    }`}
+                >
 
-                    {children}
+                    <Header />
 
-                </main>
+                    <main className="p-8">
+
+                        {children}
+
+                    </main>
+
+                </div>
 
             </div>
 
-        </div>
+        </ProtectedRoute>
 
     );
 

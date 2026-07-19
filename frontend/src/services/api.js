@@ -17,6 +17,8 @@ async function request(url, options = {}) {
         }
     }
 
+    
+
     let body = options.body;
 
     // Si body est un FormData, ne pas définir Content-Type
@@ -35,6 +37,8 @@ async function request(url, options = {}) {
 
     }
 
+
+    console.log("HEADERS =", headers);
     const response = await fetch(API_URL + url, {
         ...options,
         headers,

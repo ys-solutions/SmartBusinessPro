@@ -5,10 +5,6 @@ import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 
 import ProfileForm from "@/components/profile/ProfileForm";
-import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
-
-import Button from "@/components/ui/Button";
-import Modal from "@/components/ui/Modal";
 
 import { profileService } from "@/services/profile";
 import { passwordService } from "@/services/password";
@@ -24,32 +20,25 @@ export default function ProfilePage() {
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
     const loadProfile = async () => {
-
         try {
-
             setLoading(true);
 
             const response = await profileService.get();
 
-            if (response.success) {
+            console.log("PROFILE RESPONSE :", response);
 
+            if (response?.success && response?.data) {
                 setProfile(response.data);
-
+            } else {
+                setProfile(null);
             }
 
         } catch (error) {
-
-            console.error(
-                "Erreur chargement profil :",
-                error
-            );
-
+            console.error("Erreur chargement profil :", error);
+            setProfile(null);
         } finally {
-
             setLoading(false);
-
         }
-
     };
 
     useEffect(() => {
@@ -85,27 +74,8 @@ export default function ProfilePage() {
 
     };
 
-    const handlePassword = async (data) => {
 
-        try {
-
-            await passwordService.change(data);
-
-            toast.success(
-                "Mot de passe modifié avec succès."
-            );
-
-            setOpenPasswordModal(false);
-
-        } catch (error) {
-
-            throw error;
-
-        }
-
-    };
-
-    if (loading) {
+    if (loading || !profile) {
 
         return (
 
