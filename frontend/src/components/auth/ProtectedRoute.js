@@ -16,21 +16,26 @@ export default function ProtectedRoute({ children }) {
         if (!token) {
 
             router.replace("/login");
-
-        } else {
-
-            setChecking(false);
+            return;
 
         }
+
+        setChecking(false);
 
     }, [router]);
 
     if (checking) {
 
         return (
+
             <div className="min-h-screen flex items-center justify-center">
-                <p className="text-gray-500">Vérification de la session...</p>
+
+                <p className="text-gray-500">
+                    Vérification de la session...
+                </p>
+
             </div>
+
         );
 
     }

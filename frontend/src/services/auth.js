@@ -1,31 +1,72 @@
 import { api } from "./api";
+import { tokenService } from "./token";
+
+const API_URL = "http://127.0.0.1:8000/api/v1";
 
 export const authService = {
-  login: async (data) => {
 
-    const res = await api.post("/auth/login/", data);
+    async login(data) {
 
-    if (res?.success) {
+        const res = await api.post("/auth/login/", data);
 
-      localStorage.setItem(
-        "token",
-        res.data.tokens.access
-      );
+        if (res.success) {
 
-      localStorage.setItem(
-        "refresh",
-        res.data.tokens.refresh
-      );
+            tokenService.saveTokens(
+                res.data.tokens.access,
+                res.data.tokens.refresh
+            );
 
-    }
+        }
 
-    return res;
-  },
+        return res;
 
-  logout: () => {
+    },
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh");
+    async refreshToken() {
 
-  },
+        const refresh = tokenService.getRefreshToken();
+
+        if (!refresh) {
+
+            throw new Error("Refresh token absent.");
+
+        }
+
+        const response = await fetch(
+            `${API_URL}/auth/refresh/`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    refresh,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            tokenService.clearTokens();
+
+            throw data;
+
+        }
+
+        tokenService.saveTokens(
+            data.data.access
+        );
+
+        return data.data.access;
+
+    },
+
+    logout() {
+
+        tokenService.clearTokens();
+
+    },
+
 };
