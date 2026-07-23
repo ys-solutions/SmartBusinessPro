@@ -31,10 +31,13 @@ from django.conf.urls.static import static
 
 from accounts.views import PasswordView
 
+from rest_framework_simplejwt.views import TokenRefreshView
+
 
 urlpatterns = [
     # Auth
     path("login/", LoginView.as_view(), name="login"),
+    path("refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("register/", RegisterView.as_view(), name="register"),
     path("me/", MeView.as_view(), name="me"),
     path("profile/", ProfileView.as_view(), name="profile"),
