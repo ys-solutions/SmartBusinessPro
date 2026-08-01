@@ -1,6 +1,8 @@
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from core.permissions import HasPermission
+
 from core.base import BaseAPIView
 from core.responses import ApiResponse
 
@@ -16,7 +18,13 @@ class RoleListCreateView(BaseAPIView):
     Liste et création des rôles.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        HasPermission,
+    ]
+
+    permission_module = "accounts"
+    permission_resource = "role"
 
     def get(self, request):
 
@@ -58,7 +66,13 @@ class RoleDetailView(BaseAPIView):
     Détail, modification et suppression d'un rôle.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        HasPermission,
+    ]
+
+    permission_module = "accounts"
+    permission_resource = "role"
 
     def get(self, request, pk):
 
@@ -109,7 +123,13 @@ class RolePermissionView(BaseAPIView):
     Consultation et attribution des permissions d'un rôle.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        HasPermission,
+    ]
+
+    permission_module = "accounts"
+    permission_resource = "permission"
 
     def get(self, request, pk):
 

@@ -6,6 +6,8 @@ import TableHeader from "./TableHeader";
 import TableSearch from "./TableSearch";
 import TablePagination from "./TablePagination";
 
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+
 export default function DataTable({
 
     title,
@@ -28,6 +30,11 @@ export default function DataTable({
     const [search, setSearch] = useState("");
 
     const [page, setPage] = useState(1);
+
+    const [sortConfig, setSortConfig] = useState({
+        key: null,
+        direction: "asc",
+    });
 
     const filteredData = useMemo(() => {
 
@@ -55,12 +62,40 @@ export default function DataTable({
 
     }, [search, data, columns]);
 
+    const sortedData = useMemo(() => {
+
+        if (!sortConfig.key) {
+
+            return filteredData;
+
+        }
+
+        return [...filteredData].sort((a, b) => {
+
+            const valueA = a[sortConfig.key];
+            const valueB = b[sortConfig.key];
+
+            if (valueA == null) return 1;
+            if (valueB == null) return -1;
+
+            if (valueA < valueB)
+                return sortConfig.direction === "asc" ? -1 : 1;
+
+            if (valueA > valueB)
+                return sortConfig.direction === "asc" ? 1 : -1;
+
+            return 0;
+
+        });
+
+    }, [filteredData, sortConfig]);
+
     const totalPages = Math.max(
         1,
         Math.ceil(filteredData.length / pageSize)
     );
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = sortedData.slice(
 
         (page - 1) * pageSize,
 
@@ -106,10 +141,68 @@ export default function DataTable({
 
                                         <th
                                             key={column.key}
-                                            className="px-4 py-3 text-left text-sm font-semibold text-gray-700"
+                                            onClick={() => {
+
+                                                setPage(1);
+
+                                                setSortConfig((current) => ({
+
+                                                    key: column.key,
+
+                                                    direction:
+
+                                                        current.key === column.key &&
+                                                        current.direction === "asc"
+
+                                                            ? "desc"
+
+                                                            : "asc",
+
+                                                }));
+
+                                            }}
+                                            className="
+                                                cursor-pointer
+                                                px-4
+                                                py-3
+                                                text-left
+                                                text-sm
+                                                font-semibold
+                                                text-gray-700
+                                                select-none
+                                            "
                                         >
 
-                                            {column.label}
+                                            <div className="flex items-center gap-2">
+
+                                                {column.label}
+
+                                                {
+
+                                                    sortConfig.key === column.key
+
+                                                        ? (
+
+                                                            sortConfig.direction === "asc"
+
+                                                                ? <ArrowUp size={16}/>
+
+                                                                : <ArrowDown size={16}/>
+
+                                                        )
+
+                                                        : (
+
+                                                            <ArrowUpDown
+                                                                size={15}
+                                                                className="text-gray-400"
+                                                            />
+
+                                                        )
+
+                                                }
+
+                                            </div>
 
                                         </th>
 

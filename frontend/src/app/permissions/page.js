@@ -1,36 +1,62 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import MainLayout from "@/components/layout/MainLayout";
+import PermissionTable from "@/components/permissions/PermissionTable";
+
 import { permissionService } from "@/services/permission";
 
 export default function PermissionPage() {
 
-    useEffect(() => {
+    const [permissions, setPermissions] = useState([]);
 
-        async function load() {
+    const [loading, setLoading] = useState(true);
 
-            try {
+    const loadPermissions = async () => {
 
-                const res = await permissionService.getAll();
+        try {
 
-                console.log("PERMISSIONS =", res);
+            const res = await permissionService.getAll();
 
-            } catch (error) {
+            if (res.success) {
 
-                console.error("ERREUR =", error);
+                setPermissions(res.data);
 
             }
 
+        } finally {
+
+            setLoading(false);
+
         }
 
-        load();
+    };
+
+    useEffect(() => {
+
+        loadPermissions();
 
     }, []);
 
     return (
-        <div className="p-8">
-            Test Permissions
-        </div>
+
+        <MainLayout>
+
+            <PermissionTable
+
+                permissions={permissions}
+
+                loading={loading}
+
+                onEdit={(permission) => console.log(permission)}
+
+                onDelete={(permission) => console.log(permission)}
+
+            />
+
+        </MainLayout>
+
     );
 
 }

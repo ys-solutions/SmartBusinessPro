@@ -65,7 +65,20 @@ class CustomUser(AbstractUser):
     # Gestionnaire personnalisé
     objects = CustomUserManager()
 
-   
+    def has_permission(self, permission_code):
+        """
+        Vérifie si l'utilisateur possède une permission.
+        """
+
+        if self.is_superuser:
+            return True
+
+        if not self.role:
+            return False
+
+        return self.role.has_permission(permission_code)
+
+     
 
     class Meta:
         db_table = "users"
