@@ -165,41 +165,81 @@ export default function UserTable({
 
                   <td className="px-6 py-4">
 
-                    <div className="flex justify-center gap-2">
+                      <div className="flex justify-center gap-2">
 
-                      <button
-                        onClick={() => onView(user)}
-                        className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition"
-                        title="Voir"
-                      >
-                        <Eye size={18} />
-                      </button>
+                          {
 
-                      <button
-                        onClick={() => onAccess(user)}
-                        className="p-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 transition"
-                        title="Gérer les accès"
-                      >
-                        <ShieldCheck size={18} />
-                      </button>
+                              onView && (
 
-                      <button
-                        onClick={() => onPassword(user)}
-                        className="p-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-600 transition"
-                        title="Réinitialiser le mot de passe"
-                      >
-                        <KeyRound size={18} />
-                      </button>
+                                  <button
+                                      onClick={() => onView(user)}
+                                      className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition"
+                                      title="Voir"
+                                  >
 
-                      <button
-                        onClick={() => onDelete(user)}
-                        className="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition"
-                        title="Supprimer"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                                      <Eye size={18} />
 
-                    </div>
+                                  </button>
+
+                              )
+
+                          }
+
+                          {
+
+                              onAccess && (
+
+                                  <button
+                                      onClick={() => onAccess(user)}
+                                      className="p-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 transition"
+                                      title="Gérer les accès"
+                                  >
+
+                                      <ShieldCheck size={18} />
+
+                                  </button>
+
+                              )
+
+                          }
+
+                          {
+
+                              onPassword && (
+
+                                  <button
+                                      onClick={() => onPassword(user)}
+                                      className="p-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-600 transition"
+                                      title="Réinitialiser le mot de passe"
+                                  >
+
+                                      <KeyRound size={18} />
+
+                                  </button>
+
+                              )
+
+                          }
+
+                          {
+
+                              onDelete && (
+
+                                  <button
+                                      onClick={() => onDelete(user)}
+                                      className="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition"
+                                      title="Supprimer"
+                                  >
+
+                                      <Trash2 size={18} />
+
+                                  </button>
+
+                              )
+
+                          }
+
+                      </div>
 
                   </td>
 

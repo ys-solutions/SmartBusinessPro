@@ -56,6 +56,12 @@ export default function UserAccessForm({
 
         };
 
+         if (!open) {
+
+            return;
+
+        }
+
         loadRoles();
 
     }, []);

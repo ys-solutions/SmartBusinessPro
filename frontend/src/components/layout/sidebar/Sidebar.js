@@ -11,11 +11,57 @@ import SidebarItem from "./SidebarItem";
 import SidebarGroup from "./SidebarGroup";
 import SidebarFooter from "./SidebarFooter";
 
+import { usePermission } from "@/hooks/usePermission";
+
 export default function Sidebar({
     collapsed,
     setCollapsed,
 }) {
+
+    const { can } = usePermission();
+
+    const filteredMenu = menu
+        .map((item) => {
+
+            // Menu simple
+            if (!item.children) {
+
+                if (
+                    item.permission &&
+                    !can(item.permission)
+                ) {
+                    return null;
+                }
+
+                return item;
+
+            }
+
+            // Groupe
+            const children = item.children.filter((child) => {
+
+                if (!child.permission) {
+                    return true;
+                }
+
+                return can(child.permission);
+
+            });
+
+            if (children.length === 0) {
+                return null;
+            }
+
+            return {
+                ...item,
+                children,
+            };
+
+        })
+        .filter(Boolean);
+
     return (
+
         <aside
             className={`
                 fixed
@@ -31,31 +77,24 @@ export default function Sidebar({
                 text-white
                 transition-all
                 duration-300
-                ${
-                    collapsed
-                        ? "w-20"
-                        : "w-72"
-                }
+                ${collapsed ? "w-20" : "w-72"}
             `}
         >
+
             {/* HEADER */}
 
             <div className="relative border-b border-slate-800">
-
-                {/* Bouton Réduire */}
 
                 <button
                     onClick={() => setCollapsed(!collapsed)}
                     className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-800 transition"
                 >
-                    {collapsed ? (
-                        <ChevronRight size={20} />
-                    ) : (
-                        <ChevronLeft size={20} />
-                    )}
+                    {
+                        collapsed
+                            ? <ChevronRight size={20} />
+                            : <ChevronLeft size={20} />
+                    }
                 </button>
-
-                {/* Logo */}
 
                 <div className="flex flex-col items-center py-6">
 
@@ -69,13 +108,10 @@ export default function Sidebar({
                             shadow-lg
                             transition-all
                             duration-300
-                            ${
-                                collapsed
-                                    ? "w-14 h-14"
-                                    : "w-24 h-24"
-                            }
+                            ${collapsed ? "w-14 h-14" : "w-24 h-24"}
                         `}
                     >
+
                         <Image
                             src="/images/logo.png"
                             alt="Logo"
@@ -83,6 +119,7 @@ export default function Sidebar({
                             height={collapsed ? 38 : 70}
                             priority
                         />
+
                     </div>
 
                     <div
@@ -97,6 +134,7 @@ export default function Sidebar({
                             }
                         `}
                     >
+
                         <h2 className="text-lg font-bold text-center">
                             SmartBusiness
                         </h2>
@@ -104,6 +142,7 @@ export default function Sidebar({
                         <p className="text-xs text-slate-400 text-center">
                             Business Management
                         </p>
+
                     </div>
 
                 </div>
@@ -114,7 +153,7 @@ export default function Sidebar({
 
             <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
 
-                {menu.map((item) =>
+                {filteredMenu.map((item) => (
 
                     item.children ? (
 
@@ -137,14 +176,18 @@ export default function Sidebar({
 
                     )
 
-                )}
+                ))}
 
             </div>
 
             {/* FOOTER */}
 
-            <SidebarFooter collapsed={collapsed} />
+            <SidebarFooter
+                collapsed={collapsed}
+            />
 
         </aside>
+
     );
+
 }

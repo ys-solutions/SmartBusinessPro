@@ -16,6 +16,16 @@ export const authService = {
                 res.data.tokens.refresh
             );
 
+            localStorage.setItem(
+                "user",
+                JSON.stringify(res.data.user)
+            );
+
+            localStorage.setItem(
+                "permissions",
+                JSON.stringify(res.data.permissions)
+            );
+
         }
 
         return res;
@@ -66,6 +76,9 @@ export const authService = {
     logout() {
 
         tokenService.clearTokens();
+
+        localStorage.removeItem("user");
+        localStorage.removeItem("permissions");
 
     },
 

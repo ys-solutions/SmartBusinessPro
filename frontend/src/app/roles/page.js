@@ -8,6 +8,8 @@ import TableActions from "@/components/common/DataTable/TableActions";
 import Modal from "@/components/ui/Modal";
 
 import RoleForm from "@/components/roles/RoleForm";
+import RolePermissionForm from "@/components/roles/RolePermissionForm";
+import { usePermission } from "@/hooks/usePermission";
 
 import { roleService } from "@/services/role";
 
@@ -26,7 +28,13 @@ export default function RolesPage() {
 
     const [selectedRole, setSelectedRole] = useState(null);
 
+    const [permissionOpen, setPermissionOpen] = useState(false);
+
+    const [permissionLoading, setPermissionLoading] = useState(false);
+
     const [deleting, setDeleting] = useState(false);
+
+    const { can } = usePermission();
 
     const loadRoles = async () => {
 
@@ -67,6 +75,14 @@ export default function RolesPage() {
         setSelectedRole(role);
 
         setOpen(true);
+
+    };
+
+    const handlePermissions = (role) => {
+
+        setSelectedRole(role);
+
+        setPermissionOpen(true);
 
     };
 
@@ -143,6 +159,48 @@ export default function RolesPage() {
 
     };
 
+    const handleSavePermissions = async (permissions) => {
+
+        setPermissionLoading(true);
+
+        try {
+
+            await roleService.updatePermissions(
+
+                selectedRole.id,
+
+                {
+
+                    permissions,
+
+                }
+
+            );
+
+            toast.success(
+
+                "Permissions mises à jour."
+
+            );
+
+            setPermissionOpen(false);
+
+        } catch (error) {
+
+            toast.error(
+
+                "Erreur lors de la mise à jour."
+
+            );
+
+        } finally {
+
+            setPermissionLoading(false);
+
+        }
+
+    };
+
     const columns = [
 
         {
@@ -173,15 +231,41 @@ export default function RolesPage() {
 
                 loading={loading}
 
-                onCreate={handleCreate}
+                onCreate={
+                    can("accounts.role.create")
+                        ? handleCreate
+                        : null
+                }
 
                 renderActions={(role)=>(
 
                     <TableActions
 
-                        onEdit={()=>handleEdit(role)}
+                        canEdit={can("accounts.role.update")}
 
-                        onDelete={() => handleDelete(role)}
+                        canDelete={can("accounts.role.delete")}
+
+                        canPermission={
+                            can("accounts.permission.view")
+                        }
+
+                        onPermissions={
+                            can("accounts.permission.view")
+                                ? () => handlePermissions(role)
+                                : null
+                        }
+
+                        onEdit={
+                            can("accounts.role.update")
+                                ? () => handleEdit(role)
+                                : null
+                        }
+
+                        onDelete={
+                            can("accounts.role.delete")
+                                ? () => handleDelete(role)
+                                : null
+                        }
 
                     />
 
@@ -214,6 +298,38 @@ export default function RolesPage() {
                     onSubmit={handleSubmit}
 
                 />
+
+            </Modal>
+
+            <Modal
+
+                open={permissionOpen}
+
+                onClose={() => setPermissionOpen(false)}
+
+                title={`Permissions : ${selectedRole?.name || ""}`}
+
+                width="max-w-3xl"
+
+            >
+
+                {
+
+                    selectedRole && (
+
+                        <RolePermissionForm
+
+                            role={selectedRole}
+
+                            loading={permissionLoading}
+
+                            onSubmit={handleSavePermissions}
+
+                        />
+
+                    )
+
+                }
 
             </Modal>
 

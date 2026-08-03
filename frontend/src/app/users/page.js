@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { usePermission } from "@/hooks/usePermission";
+
 import MainLayout from "@/components/layout/MainLayout";
 import UserTable from "@/components/users/UserTable";
 import UserSearch from "@/components/users/UserSearch";
@@ -10,6 +12,7 @@ import UserCreateForm from "@/components/users/UserCreateForm";
 import { userService } from "@/services/user";
 import UserAccessForm from "@/components/users/UserAccessForm";
 import { userAccessService } from "@/services/userAccess";
+
 
 
 export default function UsersPage() {
@@ -32,6 +35,8 @@ export default function UsersPage() {
     const [openPassword, setOpenPassword] = useState(false);
 
     const [accessUser, setAccessUser] = useState(null);
+
+    const { can } = usePermission();
 
     const loadUsers = async () => {
 
@@ -194,17 +199,25 @@ export default function UsersPage() {
 
                 </div>
 
-                <button
+                {
 
-                    onClick={() => setOpenCreate(true)}
+                can("accounts.user.create") && (
 
-                    className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+                    <button
 
-                >
+                        onClick={() => setOpenCreate(true)}
 
-                    + Nouvel utilisateur
+                        className="bg-blue-600 text-white px-5 py-2 rounded-lg"
 
-                </button>
+                    >
+
+                        + Nouvel utilisateur
+
+                    </button>
+
+                )
+
+            }
 
             </div>
 
@@ -237,11 +250,33 @@ export default function UsersPage() {
                         <>
 
                             <UserTable
+
                                 users={filteredUsers}
-                                onView={handleView}
-                                onAccess={handleAccess}
-                                onPassword={handlePassword}
-                                onDelete={handleDelete}
+
+                                onView={
+                                    can("accounts.user.view")
+                                        ? handleView
+                                        : null
+                                }
+
+                                onAccess={
+                                    can("accounts.user.update")
+                                        ? handleAccess
+                                        : null
+                                }
+
+                                onPassword={
+                                    can("accounts.user.change_password")
+                                        ? handlePassword
+                                        : null
+                                }
+
+                                onDelete={
+                                    can("accounts.user.delete")
+                                        ? handleDelete
+                                        : null
+                                }
+
                             />
 
                             <UserDetail
@@ -254,30 +289,47 @@ export default function UsersPage() {
 
                             />
 
-                            <UserCreateForm
+                            {
 
-                                open={openCreate}
+                                can("accounts.user.create") && (
 
-                                onClose={() => setOpenCreate(false)}
+                                    <UserCreateForm
 
-                                onSubmit={handleCreate}
+                                        open={openCreate}
 
-                            />
+                                        onClose={() => setOpenCreate(false)}
+
+                                        onSubmit={handleCreate}
+
+                                    />
+
+                                )
+
+                            }
 
                             {
 
-                                <UserAccessForm
-                                    open={openAccess}
-                                    user={accessUser}
-                                    onClose={() => {
+                                can("accounts.user.update") && (
 
-                                        setOpenAccess(false);
+                                    <UserAccessForm
 
-                                        setAccessUser(null);
+                                        open={openAccess}
 
-                                    }}
-                                    onSubmit={handleAccessSave}
-                                />
+                                        user={accessUser}
+
+                                        onClose={() => {
+
+                                            setOpenAccess(false);
+
+                                            setAccessUser(null);
+
+                                        }}
+
+                                        onSubmit={handleAccessSave}
+
+                                    />
+
+                                )
 
                             }
 

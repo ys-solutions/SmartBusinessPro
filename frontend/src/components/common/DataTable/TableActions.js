@@ -1,12 +1,18 @@
 "use client";
 
-import { Pencil, Trash2, Eye } from "lucide-react";
+import { Pencil, Trash2, Eye, ShieldCheck } from "lucide-react";
 
 export default function TableActions({
+
+    canView = true,
+    canEdit = true,
+    canDelete = true,
+    canPermission = true,
 
     onView,
     onEdit,
     onDelete,
+    onPermission,
 
 }) {
 
@@ -16,22 +22,15 @@ export default function TableActions({
 
             {
 
-                onView && (
+                canView && onView && (
 
                     <button
                         onClick={onView}
-                        className="
-                            rounded-lg
-                            bg-blue-100
-                            p-2
-                            text-blue-600
-                            transition
-                            hover:bg-blue-200
-                        "
+                        className="rounded-lg bg-blue-100 p-2 text-blue-600 hover:bg-blue-200"
                         title="Voir"
                     >
 
-                        <Eye size={18} />
+                        <Eye size={18}/>
 
                     </button>
 
@@ -41,22 +40,33 @@ export default function TableActions({
 
             {
 
-                onEdit && (
+                canPermission && onPermission && (
+
+                    <button
+                        onClick={onPermission}
+                        className="rounded-lg bg-indigo-100 p-2 text-indigo-600 hover:bg-indigo-200"
+                        title="Permissions"
+                    >
+
+                        <ShieldCheck size={18}/>
+
+                    </button>
+
+                )
+
+            }
+
+            {
+
+                canEdit && onEdit && (
 
                     <button
                         onClick={onEdit}
-                        className="
-                            rounded-lg
-                            bg-amber-100
-                            p-2
-                            text-amber-600
-                            transition
-                            hover:bg-amber-200
-                        "
+                        className="rounded-lg bg-amber-100 p-2 text-amber-600 hover:bg-amber-200"
                         title="Modifier"
                     >
 
-                        <Pencil size={18} />
+                        <Pencil size={18}/>
 
                     </button>
 
@@ -66,22 +76,15 @@ export default function TableActions({
 
             {
 
-                onDelete && (
+                canDelete && onDelete && (
 
                     <button
                         onClick={onDelete}
-                        className="
-                            rounded-lg
-                            bg-red-100
-                            p-2
-                            text-red-600
-                            transition
-                            hover:bg-red-200
-                        "
+                        className="rounded-lg bg-red-100 p-2 text-red-600 hover:bg-red-200"
                         title="Supprimer"
                     >
 
-                        <Trash2 size={18} />
+                        <Trash2 size={18}/>
 
                     </button>
 

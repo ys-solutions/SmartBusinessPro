@@ -45,7 +45,19 @@ class LoginView(BaseAPIView):
                     "first_name": user.first_name,
                     "last_name": user.last_name,
                     "email": user.email,
+                    "role": user.role.name if user.role else None,
                 },
+
+                "permissions": [
+
+                    permission.name
+
+                    for permission in user.role.permissions.filter(
+                        is_active=True
+                    )
+
+                ] if user.role else [],
+
                 "tokens": tokens,
             },
         )

@@ -32,4 +32,10 @@ class HasPermission(BasePermission):
 
         permission_code = f"{module}.{resource}.{action}"
 
+        if not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
+            return True
+
         return request.user.has_permission(permission_code)

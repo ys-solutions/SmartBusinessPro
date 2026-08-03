@@ -162,6 +162,12 @@ export default function UserCreateForm({
 
         };
 
+        if (!open) {
+
+            return;
+
+        }
+
         loadRoles();
 
     }, []);

@@ -7,11 +7,17 @@ import PermissionTable from "@/components/permissions/PermissionTable";
 
 import { permissionService } from "@/services/permission";
 
+import { usePermission } from "@/hooks/usePermission";
+
+
+
 export default function PermissionPage() {
 
     const [permissions, setPermissions] = useState([]);
 
     const [loading, setLoading] = useState(true);
+
+    const { can } = usePermission();
 
     const loadPermissions = async () => {
 
