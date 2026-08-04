@@ -9,6 +9,8 @@ export default function PermissionTable({
 
     loading,
 
+    onCreate,
+
     onEdit,
 
     onDelete,
@@ -53,13 +55,30 @@ export default function PermissionTable({
 
             loading={loading}
 
+            onCreate={onCreate}
+
             renderActions={(permission) => (
 
                 <TableActions
 
-                    onEdit={() => onEdit(permission)}
+                    canEdit={!!onEdit}
+                    canDelete={!!onDelete}
 
-                    onDelete={() => onDelete(permission)}
+                    onEdit={
+
+                        onEdit
+                            ? () => onEdit(permission)
+                            : undefined
+
+                    }
+
+                    onDelete={
+
+                        onDelete
+                            ? () => onDelete(permission)
+                            : undefined
+
+                    }
 
                 />
 
