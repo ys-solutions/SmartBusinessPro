@@ -1,25 +1,21 @@
 from rest_framework import status
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
 from core.base import BaseAPIView
-
-from accounts.serializers import LoginSerializer
-from accounts.services.auth_service import AuthService
-
-from accounts.services.user_service import UserService
-
-from core.responses import ApiResponse
-
 from core.constants import Messages
 from core.responses import ApiResponse
 
-from rest_framework.permissions import IsAuthenticated
+from accounts.serializers import (
+    LoginSerializer,
+    LogoutSerializer,
+    UserSerializer,
+)
 
-from accounts.serializers import UserSerializer
-
-from accounts.serializers import LogoutSerializer
+from accounts.services.auth_service import AuthService
+from accounts.services.user_service import UserService
 from accounts.services import LogoutService
 
+from security.services import LoginHistoryService
 
 
 class LoginView(BaseAPIView):
@@ -30,11 +26,31 @@ class LoginView(BaseAPIView):
 
         serializer = LoginSerializer(data=request.data)
 
-        serializer.is_valid(raise_exception=True)
+        try:
+
+            serializer.is_valid(raise_exception=True)
+
+        except Exception:
+
+            LoginHistoryService.create(
+                username=request.data.get("username", ""),
+                request=request,
+                status="FAILED",
+                failure_reason="Identifiant ou mot de passe incorrect.",
+            )
+
+            raise
 
         user = serializer.validated_data["user"]
 
         tokens = AuthService.execute(user)
+
+        LoginHistoryService.create(
+            user=user,
+            username=user.username,
+            request=request,
+            status="SUCCESS",
+        )
 
         return ApiResponse.success(
             message=Messages.LOGIN_SUCCESS,
@@ -47,20 +63,16 @@ class LoginView(BaseAPIView):
                     "email": user.email,
                     "role": user.role.name if user.role else None,
                 },
-
                 "permissions": [
-
                     permission.name
-
                     for permission in user.role.permissions.filter(
                         is_active=True
                     )
-
                 ] if user.role else [],
-
                 "tokens": tokens,
             },
         )
+
 
 class RegisterView(BaseAPIView):
     """
@@ -89,7 +101,8 @@ class RegisterView(BaseAPIView):
             },
             status_code=status.HTTP_201_CREATED,
         )
-    
+
+
 class MeView(BaseAPIView):
     """
     Retourne les informations de l'utilisateur connecté.
@@ -98,6 +111,7 @@ class MeView(BaseAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+
         serializer = UserSerializer(request.user)
 
         return ApiResponse.success(
@@ -114,7 +128,9 @@ class LogoutView(BaseAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+
         serializer = LogoutSerializer(data=request.data)
+
         serializer.is_valid(raise_exception=True)
 
         LogoutService.execute(
@@ -122,5 +138,5 @@ class LogoutView(BaseAPIView):
         )
 
         return ApiResponse.success(
-            message=Messages.LOGOUT_SUCCESS
+            message=Messages.LOGOUT_SUCCESS,
         )
