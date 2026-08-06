@@ -94,9 +94,9 @@ export default function Header() {
 
     }, []);
 
-    const logout = () => {
+    const logout = async () => {
 
-        authService.logout();
+        await authService.logout();
 
         router.replace("/login");
 

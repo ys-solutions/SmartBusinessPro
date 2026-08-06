@@ -1,4 +1,5 @@
 from security.models import LoginHistory
+from django.utils import timezone
 
 
 class LoginHistoryService:
@@ -50,4 +51,34 @@ class LoginHistoryService:
             device=device,
             status=status,
             failure_reason=failure_reason,
+        )
+
+    @staticmethod
+    def logout(user):
+
+        login = (
+            LoginHistory.objects
+            .filter(
+                user=user,
+                logout_at__isnull=True,
+                status="SUCCESS",
+            )
+            .order_by("-login_at")
+            .first()
+        )
+
+        if not login:
+            return
+
+        login.logout_at = timezone.now()
+
+        login.session_duration = (
+            login.logout_at - login.login_at
+        )
+
+        login.save(
+            update_fields=[
+                "logout_at",
+                "session_duration",
+            ]
         )

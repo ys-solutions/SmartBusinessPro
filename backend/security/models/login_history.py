@@ -89,6 +89,18 @@ class LoginHistory(models.Model):
         auto_now_add=True,
     )
 
+    logout_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Déconnexion",
+    )
+
+    session_duration = models.DurationField(
+        null=True,
+        blank=True,
+        verbose_name="Durée de session",
+    )
+
     class Meta:
         db_table = "login_history"
         ordering = ["-login_at"]

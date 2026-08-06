@@ -73,12 +73,36 @@ export const authService = {
 
     },
 
-    logout() {
+    async logout() {
 
-        tokenService.clearTokens();
+        try {
 
-        localStorage.removeItem("user");
-        localStorage.removeItem("permissions");
+            const refresh = tokenService.getRefreshToken();
+
+            if (refresh) {
+
+                await api.post(
+                    "/auth/logout/",
+                    {
+                        refresh,
+                    }
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+        } finally {
+
+            tokenService.clearTokens();
+
+            localStorage.removeItem("user");
+
+            localStorage.removeItem("permissions");
+
+        }
 
     },
 

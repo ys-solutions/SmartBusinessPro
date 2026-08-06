@@ -17,6 +17,8 @@ from accounts.services import LogoutService
 
 from security.services import LoginHistoryService
 
+from security.services import LoginHistoryService
+
 
 class LoginView(BaseAPIView):
 
@@ -137,6 +139,8 @@ class LogoutView(BaseAPIView):
             serializer.validated_data["refresh"]
         )
 
+        LoginHistoryService.logout(request.user)
+        
         return ApiResponse.success(
             message=Messages.LOGOUT_SUCCESS,
         )
